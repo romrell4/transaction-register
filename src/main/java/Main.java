@@ -1,9 +1,19 @@
+import com.google.gson.Gson;
+
 import static spark.Spark.*;
 
 public class Main {
+	private static Gson gson = new Gson();
+
 	public static void main(String[] args) {
 		port(getHerokuAssignedPort());
-		get("/hello", (req, res) -> "Hello World");
+		get("/hello", (req, res) -> {
+			return json("Hello World");
+		});
+	}
+
+	private static String json(Object obj) {
+		return gson.toJson(obj);
 	}
 
 	private static int getHerokuAssignedPort() {
