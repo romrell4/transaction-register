@@ -6,8 +6,6 @@ import java.util.Date;
  * Created by eric on 9/29/16.
  */
 public class Transaction {
-	private static int databaseId = 0;
-
 	private int transactionId;
 	private PaymentType paymentType;
 	private Date purchaseDate;
@@ -16,9 +14,9 @@ public class Transaction {
 	private Category category;
 	private String description;
 	private String updatedBy;
+	private Date dateTimeUpdated;
 
 	public Transaction(PaymentType paymentType, Date purchaseDate, String business, double amount, Category category, String description) {
-		this.transactionId = createTxId();
 		this.paymentType = paymentType;
 		this.purchaseDate = purchaseDate;
 		this.business = business;
@@ -27,8 +25,16 @@ public class Transaction {
 		this.description = description;
 	}
 
-	private int createTxId() {
-		return databaseId++;
+	public Transaction(int transactionId, PaymentType paymentType, Date purchaseDate, String business, double amount, Category category, String description, String updatedBy, Date dateTimeUpdated) {
+		this.transactionId = transactionId;
+		this.paymentType = paymentType;
+		this.purchaseDate = purchaseDate;
+		this.business = business;
+		this.amount = amount;
+		this.category = category;
+		this.description = description;
+		this.updatedBy = updatedBy;
+		this.dateTimeUpdated = dateTimeUpdated;
 	}
 
 	public int getTransactionId() {
@@ -93,5 +99,13 @@ public class Transaction {
 
 	public void setUpdatedBy(String updatedBy) {
 		this.updatedBy = updatedBy;
+	}
+
+	public Date getDateTimeUpdated() {
+		return dateTimeUpdated;
+	}
+
+	public void setDateTimeUpdated(Date dateTimeUpdated) {
+		this.dateTimeUpdated = dateTimeUpdated;
 	}
 }

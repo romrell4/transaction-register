@@ -13,23 +13,29 @@ import java.util.List;
  */
 public class TransactionController {
 
-	public Transaction createTransaction(PaymentType paymentType, Date purchaseDate, String business, double amount, Category category, String description) {
-		Transaction transaction = new Transaction(paymentType, purchaseDate, business, amount, category, description);
-		transaction = TransactionDao.saveTransaction(transaction);
-		return transaction;
+	private TransactionDao dao = new TransactionDao();
+
+	public List<Transaction> getAllTransactions() {
+		return dao.getAll();
+	}
+
+	public Transaction getTransactionById(int transactionId) {
+		return dao.getById(transactionId);
+	}
+
+	public Transaction createTransaction(Transaction transaction) {
+		return dao.save(transaction);
 	}
 
 	public void deleteTransaction(int transactionId) {
-		TransactionDao.deleteById(transactionId);
+		dao.deleteById(transactionId);
 	}
 
 	public Transaction updateTransaction(int transactionId, Transaction transaction) {
-		transaction = TransactionDao.updateTransaction(transactionId, transaction);
-		return transaction;
+		return dao.update(transactionId, transaction);
 	}
 
 	public List<Transaction> getAllTransactionsByPaymentType(PaymentType paymentType) {
-		List<Transaction> transactions = TransactionDao.getAllTransactionsByPaymentType(paymentType);
-		return transactions;
+		return dao.getAllByPaymentType(paymentType);
 	}
 }
