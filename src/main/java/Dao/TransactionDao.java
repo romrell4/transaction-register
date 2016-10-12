@@ -5,11 +5,9 @@ import Model.PaymentType;
 import Model.Transaction;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
+import org.apache.log4j.Logger;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import static Model.PaymentType.*;
 import static Model.Category.*;
@@ -18,22 +16,28 @@ import static Model.Category.*;
  * Created by eric on 9/29/16.
  */
 public class TransactionDao {
+	private static final Logger LOG = Logger.getLogger(TransactionDao.class);
 	private static int databaseId = 1;
-	private static List<Transaction> database = Arrays.asList(
-			new Transaction(databaseId++, CREDIT, new Date(), "BYU", 1500.00, School, "", "", new Date()),
-			new Transaction(databaseId++, CREDIT, new Date(), "BYU", 1500.00, Misc, "", "", new Date()),
-			new Transaction(databaseId++, CREDIT, new Date(), "BYU", 1500.00, School, "", "", new Date()),
-			new Transaction(databaseId++, CREDIT, new Date(), "BYU", 1500.00, School, "", "", new Date()),
-			new Transaction(databaseId++, CREDIT, new Date(), "BYU", -1.00, Misc, "", "", new Date()),
-			new Transaction(databaseId++, DEBIT, new Date(), "BYU", 1500.00, School, "", "", new Date()),
-			new Transaction(databaseId++, CREDIT, new Date(), "BYU", 1500.00, Category.School, "", "", new Date()),
-			new Transaction(databaseId++, CREDIT, new Date(), "BYU", 1500.00, Category.School, "", "", new Date()),
-			new Transaction(databaseId++, CREDIT, new Date(), "BYU", 1500.00, Category.School, "", "", new Date()),
-			new Transaction(databaseId++, CREDIT, new Date(), "BYU", 1500.00, Category.School, "", "", new Date())
-	);
+	private static List<Transaction> database = createDatabase();
+
+	private static List<Transaction> createDatabase() {
+		List<Transaction> txs = new ArrayList<>();
+		txs.add(new Transaction(databaseId++, CREDIT, new Date(), "BYU", 1500.00, School, "", "", new Date()));
+		txs.add(new Transaction(databaseId++, CREDIT, new Date(), "BYU", 1500.00, Misc, "", "", new Date()));
+		txs.add(new Transaction(databaseId++, CREDIT, new Date(), "BYU", 1500.00, School, "", "", new Date()));
+		txs.add(new Transaction(databaseId++, CREDIT, new Date(), "BYU", 1500.00, School, "", "", new Date()));
+		txs.add(new Transaction(databaseId++, CREDIT, new Date(), "BYU", -1.00, Misc, "", "", new Date()));
+		txs.add(new Transaction(databaseId++, DEBIT, new Date(), "BYU", 1500.00, School, "", "", new Date()));
+		txs.add(new Transaction(databaseId++, CREDIT, new Date(), "BYU", 1500.00, Category.School, "", "", new Date()));
+		txs.add(new Transaction(databaseId++, CREDIT, new Date(), "BYU", 1500.00, Category.School, "", "", new Date()));
+		txs.add(new Transaction(databaseId++, CREDIT, new Date(), "BYU", 1500.00, Category.School, "", "", new Date()));
+		txs.add(new Transaction(databaseId++, CREDIT, new Date(), "BYU", 1500.00, Category.School, "", "", new Date()));
+		return txs;
+	}
 
 	public Transaction getById(int transactionId) {
-		return new ArrayList<>(Collections2.filter(database, transaction -> transaction.getTransactionId() == transactionId)).get(0);
+		Collection<Transaction> txs = Collections2.filter(database, transaction -> transaction.getTransactionId() == transactionId);
+		return txs.iterator().hasNext() ? txs.iterator().next() : null;
 	}
 
 	public List<Transaction> getAll() {
@@ -45,7 +49,10 @@ public class TransactionDao {
 	}
 
 	public void deleteById(int transactionId) {
-		database.remove(getById(transactionId));
+		Transaction tx = getById(transactionId);
+		if (tx != null) {
+			database.remove(tx);
+		}
 	}
 
 	public Transaction save(Transaction transaction) {

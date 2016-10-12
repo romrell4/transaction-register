@@ -4,6 +4,7 @@ import Dao.TransactionDao;
 import Model.Category;
 import Model.PaymentType;
 import Model.Transaction;
+import org.apache.log4j.Logger;
 
 import java.util.Date;
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.List;
  * Created by eric on 9/29/16.
  */
 public class TransactionController {
+	private static final Logger LOG = Logger.getLogger(TransactionController.class);
 
 	private TransactionDao dao = new TransactionDao();
 
