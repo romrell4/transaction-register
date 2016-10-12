@@ -17,16 +17,16 @@ import static Model.Category.*;
  */
 public class TransactionDao {
 	private static List<Transaction> database = Arrays.asList(
-			new Transaction(Credit, new Date(), "BYU", 1500.00, School, ""),
-			new Transaction(Credit, new Date(), "BYU", 1500.00, Misc, ""),
-			new Transaction(Credit, new Date(), "BYU", 1500.00, School, ""),
-			new Transaction(Credit, new Date(), "BYU", 1500.00, School, ""),
-			new Transaction(Credit, new Date(), "BYU", -1.00, Misc, ""),
-			new Transaction(Debit, new Date(), "BYU", 1500.00, School, ""),
-			new Transaction(Credit, new Date(), "BYU", 1500.00, Category.School, ""),
-			new Transaction(Credit, new Date(), "BYU", 1500.00, Category.School, ""),
-			new Transaction(Credit, new Date(), "BYU", 1500.00, Category.School, ""),
-			new Transaction(Credit, new Date(), "BYU", 1500.00, Category.School, "")
+			new Transaction(CREDIT, new Date(), "BYU", 1500.00, School, ""),
+			new Transaction(CREDIT, new Date(), "BYU", 1500.00, Misc, ""),
+			new Transaction(CREDIT, new Date(), "BYU", 1500.00, School, ""),
+			new Transaction(CREDIT, new Date(), "BYU", 1500.00, School, ""),
+			new Transaction(CREDIT, new Date(), "BYU", -1.00, Misc, ""),
+			new Transaction(DEBIT, new Date(), "BYU", 1500.00, School, ""),
+			new Transaction(CREDIT, new Date(), "BYU", 1500.00, Category.School, ""),
+			new Transaction(CREDIT, new Date(), "BYU", 1500.00, Category.School, ""),
+			new Transaction(CREDIT, new Date(), "BYU", 1500.00, Category.School, ""),
+			new Transaction(CREDIT, new Date(), "BYU", 1500.00, Category.School, "")
 	);
 
 	public static Transaction getById(int transactionId) {
