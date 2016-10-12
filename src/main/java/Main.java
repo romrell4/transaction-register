@@ -10,9 +10,7 @@ public class Main {
 
 	public static void main(String[] args) {
 		port(getHerokuAssignedPort());
-		get("/hello", (req, res) -> {
-			return json(controller.getAllTransactionsByPaymentType(PaymentType.CREDIT));
-		});
+		get("/hello", (req, res) -> json(controller.getAllTransactionsByPaymentType(PaymentType.CREDIT)));
 	}
 
 	private static String json(Object obj) {
