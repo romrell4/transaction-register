@@ -91,7 +91,7 @@ public class TransactionDao {
 		try (Connection connection = getConnection()) {
 			PreparedStatement preparedStatement = connection.prepareStatement("delete from TRANSACTIONS where TRANSACTION_ID = ?");
 			preparedStatement.setInt(1, transactionId);
-			preparedStatement.executeQuery();
+			preparedStatement.executeUpdate();
 		} catch (SQLException e) {
 			LOG.error(e);
 			throw new InternalServerException("SQL Error", e);
