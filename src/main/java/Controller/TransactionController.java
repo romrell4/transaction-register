@@ -15,9 +15,13 @@ public class TransactionController {
 
 	private TransactionDao dao = new TransactionDao();
 
-	public List<Transaction> getAllTransactions() {
+	public List<Transaction> getAllTransactions(PaymentType paymentType) {
 		LOG.info("/transactions GET");
-		return dao.getAll();
+		if (paymentType == null) {
+			return dao.getAll();
+		} else {
+			return dao.getAllByPaymentType(paymentType);
+		}
 	}
 
 	public Transaction getTransactionById(int transactionId) {
@@ -40,10 +44,5 @@ public class TransactionController {
 		LOG.info("/transactions/:id PUT");
 		dao.update(transactionId, transaction);
 		return "Success";
-	}
-
-	public List<Transaction> getAllTransactionsByPaymentType(PaymentType paymentType) {
-		LOG.info("/transactions/:type GET");
-		return dao.getAllByPaymentType(paymentType);
 	}
 }

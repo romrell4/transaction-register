@@ -6,10 +6,7 @@ import Model.Transaction;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.apache.log4j.Logger;
-import spark.ExceptionHandler;
 import spark.Request;
-import spark.Response;
-import spark.ResponseTransformer;
 
 import static spark.Spark.*;
 
@@ -23,9 +20,8 @@ public class Main {
 		System.out.println("Listening on port " + port);
 		port(port);
 
-		get("/tx", (req, res) -> controller.getAllTransactions(), gson::toJson);
+		get("/tx", (req, res) -> controller.getAllTransactions(req.queryParams("type") != null ? PaymentType.valueOf(req.queryParams("type")) : null), gson::toJson);
 		get("/tx/:id", (req, res) -> controller.getTransactionById(Integer.parseInt(req.params(":id"))), gson::toJson);
-		get("/tx/:type", (req, res) -> controller.getAllTransactionsByPaymentType(PaymentType.valueOf(req.params(":type"))), gson::toJson);
 		post("/tx", (req, res) -> controller.createTransaction(getTxFromRequest(req)), gson::toJson);
 		put("/tx/:id", (req, res) -> controller.updateTransaction(Integer.parseInt(req.params(":id")), getTxFromRequest(req)), gson::toJson);
 		delete("/tx/:id", (req, res) -> controller.deleteTransaction(Integer.parseInt(req.params(":id"))), gson::toJson);

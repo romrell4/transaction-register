@@ -35,6 +35,7 @@ public class TransactionDao {
 		config.setUsername("nttptecwetywbt");
 		config.setPassword("rGwDbJXFZKHAOQiouxXhP5fLEu");
 		config.addDataSourceProperty("sslmode", "require");
+		config.setMaximumPoolSize(3);
 
 		DATASOURCE = new HikariDataSource(config);
 	}
