@@ -11,7 +11,6 @@ import org.apache.log4j.Logger;
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.*;
-import java.util.Date;
 
 /**
  * Created by eric on 9/29/16.
@@ -25,7 +24,7 @@ public class TransactionDao {
 			return DATASOURCE.getConnection();
 		} catch (SQLException e) {
 			LOG.error(e);
-			throw new RuntimeException("Failed to connect to database", e);
+			throw new InternalServerException("Failed to connect to database", e);
 		}
 	}
 
@@ -95,13 +94,13 @@ public class TransactionDao {
 			preparedStatement.executeQuery();
 		} catch (SQLException e) {
 			LOG.error(e);
-			throw new RuntimeException("Error with statement", e);
+			throw new InternalServerException("SQL Error", e);
 		}
 	}
 
 	public Transaction save(Transaction transaction) {
 		try (Connection connection = getConnection()) {
-			PreparedStatement preparedStatement = connection.prepareStatement("insert into TRANSACTIONS (PAYMENT_TYPE, PURCHASE_DATE, BUSINESS, AMOUNT, CATEGORY, DESCRIPTION, UPDATED_BY, current_timestamp) values (?, ?, ?, ?, ?, ?, ?)");
+			PreparedStatement preparedStatement = connection.prepareStatement("insert into TRANSACTIONS (PAYMENT_TYPE, PURCHASE_DATE, BUSINESS, AMOUNT, CATEGORY, DESCRIPTION, UPDATED_BY, DATE_TIME_UPDATED) values (?, ?, ?, ?, ?, ?, ?, now()) returning *");
 			preparedStatement.setString(1, transaction.getPaymentType().toString());
 			preparedStatement.setDate(2, new java.sql.Date(transaction.getPurchaseDate().getTime()));
 			preparedStatement.setString(3, transaction.getBusiness());
@@ -114,11 +113,11 @@ public class TransactionDao {
 			if (resultSet.next()) {
 				return new Transaction(resultSet);
 			} else {
-				throw new RuntimeException("Not Found?");
+				throw new InternalServerException("Creation failed");
 			}
 		} catch (SQLException e) {
 			LOG.error(e);
-			throw new RuntimeException("Error with statement", e);
+			throw new InternalServerException("SQL Error", e);
 		}
 	}
 
@@ -144,7 +143,7 @@ public class TransactionDao {
 			}
 		} catch (SQLException e) {
 			LOG.error(e);
-			throw new RuntimeException("Error with statement", e);
+			throw new InternalServerException("SQL Error", e);
 		}
 	}
 }

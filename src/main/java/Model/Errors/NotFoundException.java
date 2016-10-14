@@ -4,7 +4,7 @@ package Model.Errors;
  * Created by eric on 10/14/16.
  */
 public class NotFoundException extends RuntimeException {
-	private ErrorMessage error = new ErrorMessage();
+	public ErrorMessage error = new ErrorMessage();
 
 	public NotFoundException() {
 	}

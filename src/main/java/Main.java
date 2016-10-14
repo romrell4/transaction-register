@@ -26,7 +26,7 @@ public class Main {
 			} catch (InternalServerException e) {
 				LOG.error(e);
 				response.status(500);
-				return json(e.getMessage());
+				return json(e.error);
 			}
 		});
 		get("/transactions/:id", (request, response) -> {
@@ -39,7 +39,7 @@ public class Main {
 			} catch (InternalServerException e) {
 				LOG.error(e);
 				response.status(500);
-				return json(e.getMessage());
+				return json(e.error);
 			}
 		});
 		get("/transactions/:type", (request, response) -> {
@@ -48,7 +48,7 @@ public class Main {
 			} catch (InternalServerException e) {
 				LOG.error(e);
 				response.status(500);
-				return json(e.getMessage());
+				return json(e.error);
 			}
 		});
 		post("/transactions", (request, response) -> {
@@ -57,7 +57,7 @@ public class Main {
 			} catch (InternalServerException e) {
 				LOG.error(e);
 				response.status(500);
-				return json(e.getMessage());
+				return json(e.error);
 			}
 		});
 		put("/transactions/:id", (request, response) -> {
@@ -66,11 +66,11 @@ public class Main {
 			} catch (NotFoundException e) {
 				LOG.error(e);
 				response.status(404);
-				return json(e.getMessage());
+				return json(e.error);
 			} catch (InternalServerException e) {
 				LOG.error(e);
 				response.status(500);
-				return json(e.getMessage());
+				return json(e.error);
 			}
 		});
 		delete("/transactions/:id", (request, response) -> {
@@ -79,11 +79,11 @@ public class Main {
 			} catch (NotFoundException e) {
 				LOG.error(e);
 				response.status(404);
-				return json(e.getMessage());
+				return json(e.error);
 			} catch (InternalServerException e) {
 				LOG.error(e);
 				response.status(500);
-				return json(e.getMessage());
+				return json(e.error);
 			}
 		});
 	}
