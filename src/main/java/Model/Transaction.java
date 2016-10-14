@@ -1,5 +1,7 @@
 package Model;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Date;
 
 /**
@@ -35,6 +37,18 @@ public class Transaction {
 		this.description = description;
 		this.updatedBy = updatedBy;
 		this.dateTimeUpdated = dateTimeUpdated;
+	}
+
+	public Transaction(ResultSet resultSet) throws SQLException {
+		this.transactionId = resultSet.getInt("TRANSACTION_ID");
+		this.paymentType = resultSet.getObject("PAYMENT_TYPE", PaymentType.class);
+		this.purchaseDate = resultSet.getDate("PURCHASE_DATE");
+		this.business = resultSet.getString("BUSINESS");
+		this.amount = resultSet.getDouble("AMOUNT");
+		this.category = resultSet.getObject("CATEGORY", Category.class);
+		this.description = resultSet.getString("DESCRIPTION");
+		this.updatedBy = resultSet.getString("UPDATED_BY");
+		this.dateTimeUpdated = resultSet.getDate("DATE_TIME_UPDATED");
 	}
 
 	public int getTransactionId() {

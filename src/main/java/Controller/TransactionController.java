@@ -2,10 +2,13 @@ package Controller;
 
 import Dao.TransactionDao;
 import Model.Category;
+import Model.ErrorResponse;
 import Model.PaymentType;
 import Model.Transaction;
 import org.apache.log4j.Logger;
 
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -17,8 +20,13 @@ public class TransactionController {
 
 	private TransactionDao dao = new TransactionDao();
 
-	public List<Transaction> getAllTransactions() {
-		return dao.getAll();
+	public Object getAllTransactions() {
+		try {
+			return dao.getAll();
+		} catch (SQLException e) {
+			LOG.error(e);
+			return new ErrorResponse("Error connecting to database");
+		}
 	}
 
 	public Transaction getTransactionById(int transactionId) {
