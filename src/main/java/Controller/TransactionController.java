@@ -16,26 +16,34 @@ public class TransactionController {
 	private TransactionDao dao = new TransactionDao();
 
 	public List<Transaction> getAllTransactions() {
+		LOG.info("/transactions GET");
 		return dao.getAll();
 	}
 
 	public Transaction getTransactionById(int transactionId) {
+		LOG.info("/transactions/:id GET");
 		return dao.getById(transactionId);
 	}
 
 	public Transaction createTransaction(Transaction transaction) {
+		LOG.info("/transactions POST");
 		return dao.save(transaction);
 	}
 
-	public void deleteTransaction(int transactionId) {
+	public String deleteTransaction(int transactionId) {
+		LOG.info("/transactions/:id DELETE");
 		dao.deleteById(transactionId);
+		return "Success";
 	}
 
-	public void updateTransaction(int transactionId, Transaction transaction) {
+	public String updateTransaction(int transactionId, Transaction transaction) {
+		LOG.info("/transactions/:id PUT");
 		dao.update(transactionId, transaction);
+		return "Success";
 	}
 
 	public List<Transaction> getAllTransactionsByPaymentType(PaymentType paymentType) {
+		LOG.info("/transactions/:type GET");
 		return dao.getAllByPaymentType(paymentType);
 	}
 }

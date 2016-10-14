@@ -1,5 +1,6 @@
 import Controller.TransactionController;
 import Model.Errors.InternalServerException;
+import Model.Errors.NotFoundException;
 import Model.PaymentType;
 import Model.Transaction;
 import com.google.gson.Gson;
@@ -20,43 +21,70 @@ public class Main {
 		port(port);
 
 		get("/transactions", (request, response) -> {
-			LOG.info("/transactions GET");
-			return json(controller.getAllTransactions());
-		});
-		get("/transactions/:id", (request, response) -> {
-			LOG.info("/transactions/:id GET");
 			try {
-				return json(controller.getTransactionById(Integer.parseInt(request.params(":id"))));
-			} catch (Exception e) {
+				return json(controller.getAllTransactions());
+			} catch (InternalServerException e) {
 				LOG.error(e);
-				return json(new InternalServerException(e.getMessage()));
+				response.status(500);
+				return json(e.getMessage());
 			}
 		});
-		get("/transactions/:type", (req, res) -> {
-			LOG.info("/transactions/:type GET");
-			PaymentType type = PaymentType.valueOf(req.params(":type").toUpperCase());
-			return json(controller.getAllTransactionsByPaymentType(type));
+		get("/transactions/:id", (request, response) -> {
+			try {
+				return json(controller.getTransactionById(Integer.parseInt(request.params(":id"))));
+			} catch (NotFoundException e) {
+				LOG.error(e);
+				response.status(404);
+				return json(e.getMessage());
+			} catch (InternalServerException e) {
+				LOG.error(e);
+				response.status(500);
+				return json(e.getMessage());
+			}
+		});
+		get("/transactions/:type", (request, response) -> {
+			try {
+				return json(controller.getAllTransactionsByPaymentType(PaymentType.valueOf(request.params(":type"))));
+			} catch (InternalServerException e) {
+				LOG.error(e);
+				response.status(500);
+				return json(e.getMessage());
+			}
 		});
 		post("/transactions", (request, response) -> {
-			LOG.info("/transactions POST");
-			Transaction transaction = getTxFromRequest(request);
-			return json(controller.createTransaction(transaction));
+			try {
+				return json(controller.createTransaction(getTxFromRequest(request)));
+			} catch (InternalServerException e) {
+				LOG.error(e);
+				response.status(500);
+				return json(e.getMessage());
+			}
 		});
 		put("/transactions/:id", (request, response) -> {
-			LOG.info("/transactions/:id PUT");
 			try {
-				Transaction transaction = getTxFromRequest(request);
-				controller.updateTransaction(Integer.parseInt(request.params(":id")), transaction);
-				return "Success";
-			} catch (Exception e) {
+				return json(controller.updateTransaction(Integer.parseInt(request.params(":id")), getTxFromRequest(request)));
+			} catch (NotFoundException e) {
 				LOG.error(e);
-				return json(e);
+				response.status(404);
+				return json(e.getMessage());
+			} catch (InternalServerException e) {
+				LOG.error(e);
+				response.status(500);
+				return json(e.getMessage());
 			}
 		});
 		delete("/transactions/:id", (request, response) -> {
-			LOG.info("/transactions/:id DELETE");
-			controller.deleteTransaction(Integer.parseInt(request.params(":id")));
-			return "Success";
+			try {
+				return json(controller.deleteTransaction(Integer.parseInt(request.params(":id"))));
+			} catch (NotFoundException e) {
+				LOG.error(e);
+				response.status(404);
+				return json(e.getMessage());
+			} catch (InternalServerException e) {
+				LOG.error(e);
+				response.status(500);
+				return json(e.getMessage());
+			}
 		});
 	}
 
