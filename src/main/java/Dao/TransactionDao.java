@@ -1,114 +1,150 @@
 package Dao;
 
-import Model.Category;
+import Model.Errors.InternalServerException;
+import Model.Errors.NotFoundException;
 import Model.PaymentType;
 import Model.Transaction;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Collections2;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import org.apache.log4j.Logger;
 
+import javax.sql.DataSource;
 import java.sql.*;
 import java.util.*;
 import java.util.Date;
-
-import static Model.PaymentType.*;
-import static Model.Category.*;
 
 /**
  * Created by eric on 9/29/16.
  */
 public class TransactionDao {
 	private static final Logger LOG = Logger.getLogger(TransactionDao.class);
-	private static int databaseId = 1;
-	private static List<Transaction> database = createDatabase();
+	private final DataSource DATASOURCE;
 
-	private static List<Transaction> createDatabase() {
-		List<Transaction> txs = new ArrayList<>();
-		txs.add(new Transaction(databaseId++, CREDIT, new Date(), "BYU", 1500.00, School, "", "", new Date()));
-		txs.add(new Transaction(databaseId++, CREDIT, new Date(), "BYU", 1500.00, Misc, "", "", new Date()));
-		txs.add(new Transaction(databaseId++, CREDIT, new Date(), "BYU", 1500.00, School, "", "", new Date()));
-		txs.add(new Transaction(databaseId++, CREDIT, new Date(), "BYU", 1500.00, School, "", "", new Date()));
-		txs.add(new Transaction(databaseId++, CREDIT, new Date(), "BYU", -1.00, Misc, "", "", new Date()));
-		txs.add(new Transaction(databaseId++, DEBIT, new Date(), "BYU", 1500.00, School, "", "", new Date()));
-		txs.add(new Transaction(databaseId++, CREDIT, new Date(), "BYU", 1500.00, Category.School, "", "", new Date()));
-		txs.add(new Transaction(databaseId++, CREDIT, new Date(), "BYU", 1500.00, Category.School, "", "", new Date()));
-		txs.add(new Transaction(databaseId++, CREDIT, new Date(), "BYU", 1500.00, Category.School, "", "", new Date()));
-		txs.add(new Transaction(databaseId++, CREDIT, new Date(), "BYU", 1500.00, Category.School, "", "", new Date()));
-		return txs;
-	}
-
-	private Connection connection;
-
-	public TransactionDao() {
-		String dbUrl = System.getenv("JDBC_DATABASE_URL");
+	private Connection getConnection() {
 		try {
-			this.connection = DriverManager.getConnection(dbUrl);
+			return DATASOURCE.getConnection();
 		} catch (SQLException e) {
-			LOG.error("Couldn't connect to the database");
+			LOG.error(e);
+			throw new RuntimeException("Failed to connect to database", e);
 		}
 	}
 
-	public Transaction getById(int transactionId) {
-		Collection<Transaction> txs = Collections2.filter(database, transaction -> transaction.getTransactionId() == transactionId);
-		return txs.iterator().hasNext() ? txs.iterator().next() : null;
+	public TransactionDao() {
+		HikariConfig config = new HikariConfig();
+		String dbUrl = System.getenv("JDBC_DATABASE_URL");
+		config.setJdbcUrl(dbUrl != null ? dbUrl : "jdbc:postgresql://ec2-54-243-202-174.compute-1.amazonaws.com:5432/dbeve90fv3htt2");
+		config.setUsername("nttptecwetywbt");
+		config.setPassword("rGwDbJXFZKHAOQiouxXhP5fLEu");
+		config.addDataSourceProperty("sslmode", "require");
+
+		DATASOURCE = new HikariDataSource(config);
 	}
 
-	public List<Transaction> getAll() throws SQLException {
-		PreparedStatement preparedStatement = null;
-		try {
-			LOG.info("Starting tx");
-			LOG.info(System.getenv("JDBC_DATABASE_URL"));
-			connection = DriverManager.getConnection(System.getenv("JDBC_DATABASE_URL"));
-			preparedStatement = connection.prepareStatement("select * from TRANSACTIONS");
-			LOG.info(preparedStatement);
+	public Transaction getById(int transactionId) {
+		try (Connection connection = getConnection()) {
+			PreparedStatement preparedStatement = connection.prepareStatement("select * from TRANSACTIONS where TRANSACTION_ID = ?");
+			preparedStatement.setInt(1, transactionId);
 			ResultSet resultSet = preparedStatement.executeQuery();
-			LOG.info("Executed tx");
+			if (resultSet.next()) {
+				return new Transaction(resultSet);
+			} else {
+				throw new NotFoundException("Couldn't find transaction with ID: " + transactionId);
+			}
+		} catch (SQLException e) {
+			LOG.error(e);
+			throw new InternalServerException("SQL Error", e);
+		}
+	}
+
+	public List<Transaction> getAll() {
+		try (Connection connection = getConnection()) {
+			ResultSet resultSet = connection.prepareStatement("select * from TRANSACTIONS").executeQuery();
 
 			List<Transaction> transactions = new ArrayList<>();
 			while (resultSet.next()) {
-				resultSet.getInt("TRANSACTION_ID");
 				transactions.add(new Transaction(resultSet));
 			}
 			return transactions;
-		} catch (Exception e) {
+		} catch (SQLException e) {
 			LOG.error(e);
-			throw e;
-		} finally {
-			if (preparedStatement != null) {
-				preparedStatement.close();
-			}
+			throw new InternalServerException("SQL Error", e);
 		}
 	}
 
 	public List<Transaction> getAllByPaymentType(PaymentType paymentType) {
-		return new ArrayList<>(Collections2.filter(database, transaction -> transaction.getPaymentType() == paymentType));
+		try (Connection connection = getConnection()) {
+			PreparedStatement preparedStatement = connection.prepareStatement("select * from TRANSACTIONS where PAYMENT_TYPE = ?");
+			preparedStatement.setString(1, paymentType.toString());
+			ResultSet resultSet = preparedStatement.executeQuery();
+
+			List<Transaction> transactions = new ArrayList<>();
+			while (resultSet.next()) {
+				transactions.add(new Transaction(resultSet));
+			}
+			return transactions;
+		} catch (SQLException e) {
+			LOG.error(e);
+			throw new InternalServerException("SQL Error", e);
+		}
 	}
 
 	public void deleteById(int transactionId) {
-		Transaction tx = getById(transactionId);
-		if (tx != null) {
-			database.remove(tx);
+		try (Connection connection = getConnection()) {
+			PreparedStatement preparedStatement = connection.prepareStatement("delete from TRANSACTIONS where TRANSACTION_ID = ?");
+			preparedStatement.setInt(1, transactionId);
+			preparedStatement.executeQuery();
+		} catch (SQLException e) {
+			LOG.error(e);
+			throw new RuntimeException("Error with statement", e);
 		}
 	}
 
 	public Transaction save(Transaction transaction) {
-		transaction.setTransactionId(databaseId++);
-		transaction.setUpdatedBy("Eric");
-		transaction.setDateTimeUpdated(new Date());
-		database.add(transaction);
-		return transaction;
+		try (Connection connection = getConnection()) {
+			PreparedStatement preparedStatement = connection.prepareStatement("insert into TRANSACTIONS (PAYMENT_TYPE, PURCHASE_DATE, BUSINESS, AMOUNT, CATEGORY, DESCRIPTION, UPDATED_BY, current_timestamp) values (?, ?, ?, ?, ?, ?, ?)");
+			preparedStatement.setString(1, transaction.getPaymentType().toString());
+			preparedStatement.setDate(2, new java.sql.Date(transaction.getPurchaseDate().getTime()));
+			preparedStatement.setString(3, transaction.getBusiness());
+			preparedStatement.setDouble(4, transaction.getAmount());
+			preparedStatement.setString(5, transaction.getCategory().toString());
+			preparedStatement.setString(6, transaction.getDescription());
+			preparedStatement.setString(7, "ERIC");
+
+			ResultSet resultSet = preparedStatement.executeQuery();
+			if (resultSet.next()) {
+				return new Transaction(resultSet);
+			} else {
+				throw new RuntimeException("Not Found?");
+			}
+		} catch (SQLException e) {
+			LOG.error(e);
+			throw new RuntimeException("Error with statement", e);
+		}
 	}
 
-	public Transaction update(int transactionId, Transaction transaction) {
-		Transaction tx = getById(transactionId);
-		tx.setPaymentType(transaction.getPaymentType());
-		tx.setPurchaseDate(transaction.getPurchaseDate());
-		tx.setBusiness(transaction.getBusiness());
-		tx.setAmount(transaction.getAmount());
-		tx.setCategory(transaction.getCategory());
-		tx.setDescription(transaction.getDescription());
-		tx.setUpdatedBy("Eric");
-		tx.setDateTimeUpdated(new Date());
-		return tx;
+	public void update(int transactionId, Transaction transaction) {
+		LOG.info(1);
+		try (Connection connection = getConnection()) {
+			LOG.info(2);
+			PreparedStatement preparedStatement = connection.prepareStatement("update TRANSACTIONS set PAYMENT_TYPE = ?, PURCHASE_DATE = ?, BUSINESS = ?, AMOUNT = ?, CATEGORY = ?, DESCRIPTION = ?, UPDATED_BY = ?, DATE_TIME_UPDATED = now() where TRANSACTION_ID = ?");
+			LOG.info(3);
+			preparedStatement.setString(1, transaction.getPaymentType().toString());
+			preparedStatement.setDate(2, new java.sql.Date(transaction.getPurchaseDate().getTime()));
+			preparedStatement.setString(3, transaction.getBusiness());
+			preparedStatement.setDouble(4, transaction.getAmount());
+			preparedStatement.setString(5, transaction.getCategory().toString());
+			preparedStatement.setString(6, transaction.getDescription());
+			preparedStatement.setString(7, "ERIC");
+			preparedStatement.setInt(8, transactionId);
+
+			int results = preparedStatement.executeUpdate();
+			LOG.info(results);
+			if (results == 0) {
+				throw new NotFoundException("No results updated");
+			}
+		} catch (SQLException e) {
+			LOG.error(e);
+			throw new RuntimeException("Error with statement", e);
+		}
 	}
 }

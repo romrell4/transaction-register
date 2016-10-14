@@ -41,11 +41,11 @@ public class Transaction {
 
 	public Transaction(ResultSet resultSet) throws SQLException {
 		this.transactionId = resultSet.getInt("TRANSACTION_ID");
-		this.paymentType = resultSet.getObject("PAYMENT_TYPE", PaymentType.class);
+		this.paymentType = PaymentType.valueOf(resultSet.getString("PAYMENT_TYPE"));
 		this.purchaseDate = resultSet.getDate("PURCHASE_DATE");
 		this.business = resultSet.getString("BUSINESS");
 		this.amount = resultSet.getDouble("AMOUNT");
-		this.category = resultSet.getObject("CATEGORY", Category.class);
+		this.category = Category.valueOf(resultSet.getString("CATEGORY"));
 		this.description = resultSet.getString("DESCRIPTION");
 		this.updatedBy = resultSet.getString("UPDATED_BY");
 		this.dateTimeUpdated = resultSet.getDate("DATE_TIME_UPDATED");

@@ -1,8 +1,9 @@
 import Controller.TransactionController;
-import Model.ErrorResponse;
+import Model.Errors.InternalServerException;
 import Model.PaymentType;
 import Model.Transaction;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.apache.log4j.Logger;
 import spark.Request;
 
@@ -10,7 +11,7 @@ import static spark.Spark.*;
 
 public class Main {
 	private static final Logger LOG = Logger.getLogger(Main.class);
-	private static Gson gson = new Gson();
+	private static Gson gson = new GsonBuilder().setDateFormat("MM/dd/yyyy HH:mm:ss").create();
 	private static TransactionController controller = new TransactionController();
 
 	public static void main(String[] args) {
@@ -24,12 +25,11 @@ public class Main {
 		});
 		get("/transactions/:id", (request, response) -> {
 			LOG.info("/transactions/:id GET");
-			Transaction tx = controller.getTransactionById(Integer.parseInt(request.params(":id")));
-			if (tx != null) {
+			try {
 				return json(controller.getTransactionById(Integer.parseInt(request.params(":id"))));
-			} else {
-				response.status(404);
-				return json(new ErrorResponse("Not Found"));
+			} catch (Exception e) {
+				LOG.error(e);
+				return json(new InternalServerException(e.getMessage()));
 			}
 		});
 		get("/transactions/:type", (req, res) -> {
@@ -44,8 +44,14 @@ public class Main {
 		});
 		put("/transactions/:id", (request, response) -> {
 			LOG.info("/transactions/:id PUT");
-			Transaction transaction = getTxFromRequest(request);
-			return json(controller.updateTransaction(Integer.parseInt(request.params(":id")), transaction));
+			try {
+				Transaction transaction = getTxFromRequest(request);
+				controller.updateTransaction(Integer.parseInt(request.params(":id")), transaction);
+				return "Success";
+			} catch (Exception e) {
+				LOG.error(e);
+				return json(e);
+			}
 		});
 		delete("/transactions/:id", (request, response) -> {
 			LOG.info("/transactions/:id DELETE");
