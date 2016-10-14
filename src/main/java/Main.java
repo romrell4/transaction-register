@@ -6,7 +6,10 @@ import Model.Transaction;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.apache.log4j.Logger;
+import spark.ExceptionHandler;
 import spark.Request;
+import spark.Response;
+import spark.ResponseTransformer;
 
 import static spark.Spark.*;
 
@@ -20,76 +23,23 @@ public class Main {
 		System.out.println("Listening on port " + port);
 		port(port);
 
-		get("/transactions", (request, response) -> {
-			try {
-				return json(controller.getAllTransactions());
-			} catch (InternalServerException e) {
-				LOG.error(e);
-				response.status(500);
-				return json(e.error);
-			}
-		});
-		get("/transactions/:id", (request, response) -> {
-			try {
-				return json(controller.getTransactionById(Integer.parseInt(request.params(":id"))));
-			} catch (NotFoundException e) {
-				LOG.error(e);
-				response.status(404);
-				return json(e.getMessage());
-			} catch (InternalServerException e) {
-				LOG.error(e);
-				response.status(500);
-				return json(e.error);
-			}
-		});
-		get("/transactions/:type", (request, response) -> {
-			try {
-				return json(controller.getAllTransactionsByPaymentType(PaymentType.valueOf(request.params(":type"))));
-			} catch (InternalServerException e) {
-				LOG.error(e);
-				response.status(500);
-				return json(e.error);
-			}
-		});
-		post("/transactions", (request, response) -> {
-			try {
-				return json(controller.createTransaction(getTxFromRequest(request)));
-			} catch (InternalServerException e) {
-				LOG.error(e);
-				response.status(500);
-				return json(e.error);
-			}
-		});
-		put("/transactions/:id", (request, response) -> {
-			try {
-				return json(controller.updateTransaction(Integer.parseInt(request.params(":id")), getTxFromRequest(request)));
-			} catch (NotFoundException e) {
-				LOG.error(e);
-				response.status(404);
-				return json(e.error);
-			} catch (InternalServerException e) {
-				LOG.error(e);
-				response.status(500);
-				return json(e.error);
-			}
-		});
-		delete("/transactions/:id", (request, response) -> {
-			try {
-				return json(controller.deleteTransaction(Integer.parseInt(request.params(":id"))));
-			} catch (NotFoundException e) {
-				LOG.error(e);
-				response.status(404);
-				return json(e.error);
-			} catch (InternalServerException e) {
-				LOG.error(e);
-				response.status(500);
-				return json(e.error);
-			}
-		});
-	}
+		get("/tx", (req, res) -> controller.getAllTransactions(), gson::toJson);
+		get("/tx/:id", (req, res) -> controller.getTransactionById(Integer.parseInt(req.params(":id"))), gson::toJson);
+		get("/tx/:type", (req, res) -> controller.getAllTransactionsByPaymentType(PaymentType.valueOf(req.params(":type"))), gson::toJson);
+		post("/tx", (req, res) -> controller.createTransaction(getTxFromRequest(req)), gson::toJson);
+		put("/tx/:id", (req, res) -> controller.updateTransaction(Integer.parseInt(req.params(":id")), getTxFromRequest(req)), gson::toJson);
+		delete("/tx/:id", (req, res) -> controller.deleteTransaction(Integer.parseInt(req.params(":id"))), gson::toJson);
 
-	private static String json(Object obj) {
-		return gson.toJson(obj);
+		exception(NotFoundException.class, (e, request, response) -> {
+			LOG.error(e);
+			response.status(404);
+			response.body(gson.toJson(((NotFoundException) e).error));
+		});
+		exception(InternalServerException.class, (e, request, response) -> {
+			LOG.error(e);
+			response.status(500);
+			response.body(gson.toJson(((InternalServerException) e).error));
+		});
 	}
 
 	private static Transaction getTxFromRequest(Request request) {

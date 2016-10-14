@@ -121,11 +121,11 @@ public class TransactionDao {
 		}
 	}
 
-	public void update(int transactionId, Transaction transaction) {
+	public Transaction update(int transactionId, Transaction transaction) {
 		LOG.info(1);
 		try (Connection connection = getConnection()) {
 			LOG.info(2);
-			PreparedStatement preparedStatement = connection.prepareStatement("update TRANSACTIONS set PAYMENT_TYPE = ?, PURCHASE_DATE = ?, BUSINESS = ?, AMOUNT = ?, CATEGORY = ?, DESCRIPTION = ?, UPDATED_BY = ?, DATE_TIME_UPDATED = now() where TRANSACTION_ID = ?");
+			PreparedStatement preparedStatement = connection.prepareStatement("update TRANSACTIONS set PAYMENT_TYPE = ?, PURCHASE_DATE = ?, BUSINESS = ?, AMOUNT = ?, CATEGORY = ?, DESCRIPTION = ?, UPDATED_BY = ?, DATE_TIME_UPDATED = now() where TRANSACTION_ID = ? returning *");
 			LOG.info(3);
 			preparedStatement.setString(1, transaction.getPaymentType().toString());
 			preparedStatement.setDate(2, new java.sql.Date(transaction.getPurchaseDate().getTime()));
@@ -136,10 +136,11 @@ public class TransactionDao {
 			preparedStatement.setString(7, "ERIC");
 			preparedStatement.setInt(8, transactionId);
 
-			int results = preparedStatement.executeUpdate();
-			LOG.info(results);
-			if (results == 0) {
-				throw new NotFoundException("No results updated");
+			ResultSet resultSet = preparedStatement.executeQuery();
+			if (resultSet.next()) {
+				return new Transaction(resultSet);
+			} else {
+				throw new NotFoundException("Couldn't find transaction with ID: " + transactionId);
 			}
 		} catch (SQLException e) {
 			LOG.error(e);
