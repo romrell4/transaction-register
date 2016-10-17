@@ -1,4 +1,5 @@
 import Controller.TransactionController;
+import Model.Errors.BadRequestException;
 import Model.Errors.InternalServerException;
 import Model.Errors.NotFoundException;
 import Model.PaymentType;
@@ -20,12 +21,25 @@ public class Main {
 		System.out.println("Listening on port " + port);
 		port(port);
 
-		get("/tx", (req, res) -> controller.getAllTransactions(req.queryParams("type") != null ? PaymentType.valueOf(req.queryParams("type")) : null), gson::toJson);
+		get("/tx", (req, res) -> {
+			final String type = req.queryParams("type");
+			try {
+				final PaymentType paymentType = type != null ? PaymentType.valueOf(type) : null;
+				return controller.getAllTransactions(paymentType);
+			} catch (IllegalArgumentException e) {
+				throw new BadRequestException("Invalid payment type " + type, e);
+			}
+		}, gson::toJson);
 		get("/tx/:id", (req, res) -> controller.getTransactionById(Integer.parseInt(req.params(":id"))), gson::toJson);
 		post("/tx", (req, res) -> controller.createTransaction(getTxFromRequest(req)), gson::toJson);
 		put("/tx/:id", (req, res) -> controller.updateTransaction(Integer.parseInt(req.params(":id")), getTxFromRequest(req)), gson::toJson);
 		delete("/tx/:id", (req, res) -> controller.deleteTransaction(Integer.parseInt(req.params(":id"))), gson::toJson);
 
+		exception(BadRequestException.class, (e, request, response) -> {
+			LOG.error(e);
+			response.status(400);
+			response.body(gson.toJson(((BadRequestException) e).error));
+		});
 		exception(NotFoundException.class, (e, request, response) -> {
 			LOG.error(e);
 			response.status(404);
@@ -35,6 +49,11 @@ public class Main {
 			LOG.error(e);
 			response.status(500);
 			response.body(gson.toJson(((InternalServerException) e).error));
+		});
+		exception(Exception.class, (e, request, response) -> {
+			LOG.error(e);
+			response.status(500);
+			response.body(e.getMessage());
 		});
 	}
 
