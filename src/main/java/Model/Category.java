@@ -17,6 +17,6 @@ public enum Category {
 	INSURANCE,
 	RENT,
 	PHONE,
-	UTITLITIES,
+	UTILITIES,
 	BIG_PURCHASE
 }

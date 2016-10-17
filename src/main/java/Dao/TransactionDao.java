@@ -22,7 +22,7 @@ public class TransactionDao {
 	private Connection getConnection() {
 		try {
 			return DATASOURCE.getConnection();
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			LOG.error(e);
 			throw new InternalServerException("Failed to connect to database", e);
 		}
@@ -50,7 +50,7 @@ public class TransactionDao {
 			} else {
 				throw new NotFoundException("Couldn't find transaction with ID: " + transactionId);
 			}
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			LOG.error(e);
 			throw new InternalServerException("SQL Error", e);
 		}
@@ -65,7 +65,7 @@ public class TransactionDao {
 				transactions.add(new Transaction(resultSet));
 			}
 			return transactions;
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			LOG.error(e);
 			throw new InternalServerException("SQL Error", e);
 		}
@@ -82,7 +82,7 @@ public class TransactionDao {
 				transactions.add(new Transaction(resultSet));
 			}
 			return transactions;
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			LOG.error(e);
 			throw new InternalServerException("SQL Error", e);
 		}
@@ -93,7 +93,7 @@ public class TransactionDao {
 			PreparedStatement preparedStatement = connection.prepareStatement("delete from TRANSACTIONS where TRANSACTION_ID = ?");
 			preparedStatement.setInt(1, transactionId);
 			preparedStatement.executeUpdate();
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			LOG.error(e);
 			throw new InternalServerException("SQL Error", e);
 		}
@@ -116,7 +116,7 @@ public class TransactionDao {
 			} else {
 				throw new InternalServerException("Creation failed");
 			}
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			LOG.error(e);
 			throw new InternalServerException("SQL Error", e);
 		}
@@ -143,7 +143,7 @@ public class TransactionDao {
 			} else {
 				throw new NotFoundException("Couldn't find transaction with ID: " + transactionId);
 			}
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			LOG.error(e);
 			throw new InternalServerException("SQL Error", e);
 		}

@@ -16,7 +16,7 @@ public class TransactionController {
 	private TransactionDao dao = new TransactionDao();
 
 	public List<Transaction> getAllTransactions(PaymentType paymentType) {
-		LOG.info("/transactions GET");
+		LOG.info("/transactions GET" + (paymentType != null ? " " + paymentType : ""));
 		if (paymentType == null) {
 			return dao.getAll();
 		} else {
