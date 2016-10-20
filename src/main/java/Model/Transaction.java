@@ -13,31 +13,10 @@ public class Transaction {
 	private Date purchaseDate;
 	private String business;
 	private double amount;
-	private Category category;
+	private int categoryId;
 	private String description;
 	private String updatedBy;
 	private Date dateTimeUpdated;
-
-	public Transaction(PaymentType paymentType, Date purchaseDate, String business, double amount, Category category, String description) {
-		this.paymentType = paymentType;
-		this.purchaseDate = purchaseDate;
-		this.business = business;
-		this.amount = amount;
-		this.category = category;
-		this.description = description;
-	}
-
-	public Transaction(int transactionId, PaymentType paymentType, Date purchaseDate, String business, double amount, Category category, String description, String updatedBy, Date dateTimeUpdated) {
-		this.transactionId = transactionId;
-		this.paymentType = paymentType;
-		this.purchaseDate = purchaseDate;
-		this.business = business;
-		this.amount = amount;
-		this.category = category;
-		this.description = description;
-		this.updatedBy = updatedBy;
-		this.dateTimeUpdated = dateTimeUpdated;
-	}
 
 	public Transaction(ResultSet resultSet) throws SQLException {
 		this.transactionId = resultSet.getInt("TRANSACTION_ID");
@@ -45,7 +24,7 @@ public class Transaction {
 		this.purchaseDate = resultSet.getDate("PURCHASE_DATE");
 		this.business = resultSet.getString("BUSINESS");
 		this.amount = resultSet.getDouble("AMOUNT");
-		this.category = Category.valueOf(resultSet.getString("CATEGORY"));
+		this.categoryId = resultSet.getInt("CATEGORY_ID");
 		this.description = resultSet.getString("DESCRIPTION");
 		this.updatedBy = resultSet.getString("UPDATED_BY");
 		this.dateTimeUpdated = resultSet.getDate("DATE_TIME_UPDATED");
@@ -91,12 +70,12 @@ public class Transaction {
 		this.amount = amount;
 	}
 
-	public Category getCategory() {
-		return category;
+	public int getCategoryId() {
+		return categoryId;
 	}
 
-	public void setCategory(Category category) {
-		this.category = category;
+	public void setCategoryId(int categoryId) {
+		this.categoryId = categoryId;
 	}
 
 	public String getDescription() {

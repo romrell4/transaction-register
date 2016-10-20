@@ -1,3 +1,4 @@
+import Controller.CategoryController;
 import Controller.TransactionController;
 import Model.Errors.BadRequestException;
 import Model.Errors.InternalServerException;
@@ -6,15 +7,17 @@ import Model.PaymentType;
 import Model.Transaction;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import spark.Request;
 
 import static spark.Spark.*;
 
 public class Main {
-	private static final Logger LOG = Logger.getLogger(Main.class);
+	private static final Logger LOG = LogManager.getLogger(Main.class);
 	private static Gson gson = new GsonBuilder().setDateFormat("MM/dd/yyyy HH:mm:ss").create();
-	private static TransactionController controller = new TransactionController();
+	private static CategoryController categoryController = new CategoryController();
+	private static TransactionController transactionController = new TransactionController();
 
 	public static void main(String[] args) {
 		int port = getHerokuAssignedPort();
@@ -25,15 +28,21 @@ public class Main {
 			final String type = req.queryParams("type");
 			try {
 				final PaymentType paymentType = type != null ? PaymentType.valueOf(type) : null;
-				return controller.getAllTransactions(paymentType);
+				return transactionController.getAllTransactions(paymentType);
 			} catch (IllegalArgumentException e) {
 				throw new BadRequestException("Invalid payment type " + type, e);
 			}
 		}, gson::toJson);
-		get("/tx/:id", (req, res) -> controller.getTransactionById(Integer.parseInt(req.params(":id"))), gson::toJson);
-		post("/tx", (req, res) -> controller.createTransaction(getTxFromRequest(req)), gson::toJson);
-		put("/tx/:id", (req, res) -> controller.updateTransaction(Integer.parseInt(req.params(":id")), getTxFromRequest(req)), gson::toJson);
-		delete("/tx/:id", (req, res) -> controller.deleteTransaction(Integer.parseInt(req.params(":id"))), gson::toJson);
+		get("/tx/:id", (req, res) -> transactionController.getTransactionById(Integer.parseInt(req.params(":id"))), gson::toJson);
+		post("/tx", (req, res) -> transactionController.createTransaction(getTxFromRequest(req)), gson::toJson);
+		put("/tx/:id", (req, res) -> transactionController.updateTransaction(Integer.parseInt(req.params(":id")), getTxFromRequest(req)), gson::toJson);
+		delete("/tx/:id", (req, res) -> transactionController.deleteTransaction(Integer.parseInt(req.params(":id"))), gson::toJson);
+
+		get("/categories", (req, res) -> {
+			String month = req.queryParams("month");
+			String year = req.queryParams("year");
+			return categoryController.getAllCategoriesByMonth(month != null ? Integer.parseInt(month) : null, year != null ? Integer.parseInt(year) : null);
+		}, gson::toJson);
 
 		exception(BadRequestException.class, (e, request, response) -> {
 			LOG.error(e);

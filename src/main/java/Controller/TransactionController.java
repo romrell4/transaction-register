@@ -3,7 +3,8 @@ package Controller;
 import Dao.TransactionDao;
 import Model.PaymentType;
 import Model.Transaction;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.List;
 
@@ -11,7 +12,7 @@ import java.util.List;
  * Created by eric on 9/29/16.
  */
 public class TransactionController {
-	private static final Logger LOG = Logger.getLogger(TransactionController.class);
+	private static final Logger LOG = LogManager.getLogger(TransactionController.class);
 
 	private TransactionDao dao = new TransactionDao();
 
