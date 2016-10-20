@@ -28,6 +28,5 @@ public class CategoryControllerTest {
 
 		categories = controller.getAllCategoriesByMonth(9, 2014);
 		assertTrue(categories.size() > 0);
-		assertTrue(false);
 	}
 }
