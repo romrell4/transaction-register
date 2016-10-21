@@ -23,10 +23,22 @@ public class CategoryControllerTest {
 
 	@Test
 	public void test1() {
-		List<CategoryHelper> categories = controller.getAllCategoriesByMonth(null, null);
-		assertTrue(categories.size() > 0);
+		List<CategoryHelper> categories = controller.getAllCategoriesForBudget(null, null, null);
+		int fullSize = categories.size();
+		assertTrue(fullSize > 0);
 
-		categories = controller.getAllCategoriesByMonth(9, 2014);
-		assertTrue(categories.size() > 0);
+		categories = controller.getAllCategoriesForBudget(null, 9, null);
+		assertTrue(categories.size() == fullSize);
+
+		categories = controller.getAllCategoriesForBudget(null, null, 2015);
+		assertTrue(categories.size() == fullSize);
+
+		categories = controller.getAllCategoriesForBudget(null, 9, 2015);
+		int oneMonthSize = categories.size();
+		assertTrue(oneMonthSize < fullSize);
+
+		categories = controller.getAllCategoriesForBudget(categories.get(0).getCategoryId(), null, null);
+		int oneCategorySize = categories.size();
+		assertTrue(oneCategorySize < fullSize);
 	}
 }

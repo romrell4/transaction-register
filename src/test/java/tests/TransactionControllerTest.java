@@ -40,6 +40,6 @@ public class TransactionControllerTest {
 		assertTrue(txs.size() > 0);
 
 		Transaction tx = controller.getTransactionById(txs.get(0).getTransactionId());
-		assertTrue(tx.getTransactionId() > txs.get(0).getTransactionId());
+		assertTrue(tx.getTransactionId() == txs.get(0).getTransactionId());
 	}
 }

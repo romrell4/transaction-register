@@ -39,9 +39,10 @@ public class Main {
 		delete("/tx/:id", (req, res) -> transactionController.deleteTransaction(Integer.parseInt(req.params(":id"))), gson::toJson);
 
 		get("/categories", (req, res) -> {
+			String categoryId = req.queryParams("categoryId");
 			String month = req.queryParams("month");
 			String year = req.queryParams("year");
-			return categoryController.getAllCategoriesByMonth(month != null ? Integer.parseInt(month) : null, year != null ? Integer.parseInt(year) : null);
+			return categoryController.getAllCategoriesForBudget(toInt(categoryId), toInt(month), toInt(year));
 		}, gson::toJson);
 
 		exception(BadRequestException.class, (e, request, response) -> {
@@ -73,5 +74,13 @@ public class Main {
 	private static int getHerokuAssignedPort() {
 		ProcessBuilder processBuilder = new ProcessBuilder();
 		return processBuilder.environment().get("PORT") != null ? Integer.parseInt(processBuilder.environment().get("PORT")) : 4567;
+	}
+
+	private static Integer toInt(String string) {
+		try {
+			return string != null ? Integer.parseInt(string) : null;
+		} catch (Exception e) {
+			throw new BadRequestException("Invalid query parameter", e);
+		}
 	}
 }

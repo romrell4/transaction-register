@@ -8,6 +8,7 @@ import org.apache.logging.log4j.Logger;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
+import java.util.List;
 
 /**
  * Created by eric on 10/18/16.
@@ -34,6 +35,14 @@ class BaseDao {
 		} catch (Exception e) {
 			LOG.error(e);
 			throw new InternalServerException("Failed to connect to database", e);
+		}
+	}
+
+	String createWhereClause(List<String> whereStatements) {
+		if (whereStatements.isEmpty()) {
+			return "";
+		} else {
+			return "where " + String.join("and ", whereStatements);
 		}
 	}
 }

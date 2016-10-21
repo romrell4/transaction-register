@@ -23,4 +23,52 @@ public class CategoryHelper {
 		this.amountSpent = resultSet.getDouble("AMOUNT_SPENT");
 		this.amountLeft = resultSet.getDouble("AMOUNT_LEFT");
 	}
+
+	public int getCategoryId() {
+		return categoryId;
+	}
+
+	public void setCategoryId(int categoryId) {
+		this.categoryId = categoryId;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getMonth() {
+		return month;
+	}
+
+	public void setMonth(String month) {
+		this.month = month;
+	}
+
+	public double getAmountBudgeted() {
+		return amountBudgeted;
+	}
+
+	public void setAmountBudgeted(double amountBudgeted) {
+		this.amountBudgeted = amountBudgeted;
+	}
+
+	public double getAmountSpent() {
+		return amountSpent;
+	}
+
+	public void setAmountSpent(double amountSpent) {
+		this.amountSpent = amountSpent;
+	}
+
+	public double getAmountLeft() {
+		return amountLeft;
+	}
+
+	public void setAmountLeft(double amountLeft) {
+		this.amountLeft = amountLeft;
+	}
 }

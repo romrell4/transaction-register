@@ -17,7 +17,7 @@ public class CategoryController {
 	private CategoryDao categoryDao = new CategoryDao();
 	private TransactionDao transactionDao = new TransactionDao();
 
-	public List<CategoryHelper> getAllCategoriesByMonth(Integer month, Integer year) {
-		return categoryDao.getAllByMonth(month, year);
+	public List<CategoryHelper> getAllCategoriesForBudget(Integer categoryId, Integer month, Integer year) {
+		return categoryDao.getBudget(categoryId, month, year);
 	}
 }
