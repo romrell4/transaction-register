@@ -16,9 +16,19 @@ import java.util.*;
 public class TransactionDao extends BaseDao {
 	private static final Logger LOG = LogManager.getLogger(TransactionDao.class);
 
-	public List<Transaction> getAll() {
+	public List<Transaction> getAll(PaymentType paymentType, Integer month, Integer year) {
 		try (Connection connection = getConnection()) {
-			ResultSet resultSet = connection.prepareStatement("select * from TRANSACTIONS").executeQuery();
+			String sql = "select * from TRANSACTIONS ";
+			List<String> whereStatements = new ArrayList<>();
+			if (paymentType != null) {
+				whereStatements.add("PAYMENT_TYPE = '" + paymentType + "' ");
+			}
+			if (month != null && year != null) {
+				whereStatements.add("TO_CHAR(PURCHASE_DATE, 'YYYY-MM') = '" + year + "-" + month + "' ");
+			}
+			sql += createWhereClause(whereStatements);
+			LOG.debug(sql);
+			ResultSet resultSet = connection.prepareStatement(sql).executeQuery();
 
 			List<Transaction> transactions = new ArrayList<>();
 			while (resultSet.next()) {

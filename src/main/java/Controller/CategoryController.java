@@ -11,13 +11,15 @@ import java.util.List;
 /**
  * Created by eric on 10/18/16.
  */
-public class CategoryController {
+public class CategoryController extends BaseController {
 	private static final Logger LOG = LogManager.getLogger(CategoryController.class);
 
 	private CategoryDao categoryDao = new CategoryDao();
-	private TransactionDao transactionDao = new TransactionDao();
 
-	public List<CategoryHelper> getAllCategoriesForBudget(Integer categoryId, Integer month, Integer year) {
+	public List<CategoryHelper> getAllCategoriesForBudget(String categoryIdStr, String monthStr, String yearStr) {
+		Integer categoryId = categoryIdStr == null ? null : toInt(categoryIdStr);
+		Integer month = monthStr == null ? null : toInt(monthStr);
+		Integer year = yearStr == null ? null : toInt(yearStr);
 		return categoryDao.getBudget(categoryId, month, year);
 	}
 }

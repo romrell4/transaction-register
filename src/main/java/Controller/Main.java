@@ -24,26 +24,13 @@ public class Main {
 		System.out.println("Listening on port " + port);
 		port(port);
 
-		get("/tx", (req, res) -> {
-			final String type = req.queryParams("type");
-			try {
-				final PaymentType paymentType = type != null ? PaymentType.valueOf(type) : null;
-				return transactionController.getAllTransactions(paymentType);
-			} catch (IllegalArgumentException e) {
-				throw new BadRequestException("Invalid payment type " + type, e);
-			}
-		}, gson::toJson);
-		get("/tx/:id", (req, res) -> transactionController.getTransactionById(Integer.parseInt(req.params(":id"))), gson::toJson);
-		post("/tx", (req, res) -> transactionController.createTransaction(getTxFromRequest(req)), gson::toJson);
-		put("/tx/:id", (req, res) -> transactionController.updateTransaction(Integer.parseInt(req.params(":id")), getTxFromRequest(req)), gson::toJson);
-		delete("/tx/:id", (req, res) -> transactionController.deleteTransaction(Integer.parseInt(req.params(":id"))), gson::toJson);
+		get("/transactions", (req, res) -> transactionController.getAllTransactions(req.queryParams("type"), req.queryParams("month"), req.queryParams("year")), gson::toJson);
+		get("/transactions/:id", (req, res) -> transactionController.getTransactionById(req.params(":id")), gson::toJson);
+		post("/transactions", (req, res) -> transactionController.createTransaction(getTxFromRequest(req)), gson::toJson);
+		put("/transactions/:id", (req, res) -> transactionController.updateTransaction(req.params(":id"), getTxFromRequest(req)), gson::toJson);
+		delete("/transactions/:id", (req, res) -> transactionController.deleteTransaction(req.params(":id")), gson::toJson);
 
-		get("/categories", (req, res) -> {
-			String categoryId = req.queryParams("categoryId");
-			String month = req.queryParams("month");
-			String year = req.queryParams("year");
-			return categoryController.getAllCategoriesForBudget(toInt(categoryId), toInt(month), toInt(year));
-		}, gson::toJson);
+		get("/categories", (req, res) -> categoryController.getAllCategoriesForBudget(req.queryParams("categoryId"), req.queryParams("month"), req.queryParams("year")), gson::toJson);
 
 		exception(BadRequestException.class, (e, request, response) -> {
 			LOG.error(e);
@@ -74,13 +61,5 @@ public class Main {
 	private static int getHerokuAssignedPort() {
 		ProcessBuilder processBuilder = new ProcessBuilder();
 		return processBuilder.environment().get("PORT") != null ? Integer.parseInt(processBuilder.environment().get("PORT")) : 4567;
-	}
-
-	private static Integer toInt(String string) {
-		try {
-			return string != null ? Integer.parseInt(string) : null;
-		} catch (Exception e) {
-			throw new BadRequestException("Invalid query parameter", e);
-		}
 	}
 }

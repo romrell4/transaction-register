@@ -27,17 +27,17 @@ public class CategoryControllerTest {
 		int fullSize = categories.size();
 		assertTrue(fullSize > 0);
 
-		categories = controller.getAllCategoriesForBudget(null, 9, null);
+		categories = controller.getAllCategoriesForBudget(null, "9", null);
 		assertTrue(categories.size() == fullSize);
 
-		categories = controller.getAllCategoriesForBudget(null, null, 2015);
+		categories = controller.getAllCategoriesForBudget(null, null, "2015");
 		assertTrue(categories.size() == fullSize);
 
-		categories = controller.getAllCategoriesForBudget(null, 9, 2015);
+		categories = controller.getAllCategoriesForBudget(null, "09", "2015");
 		int oneMonthSize = categories.size();
 		assertTrue(oneMonthSize < fullSize);
 
-		categories = controller.getAllCategoriesForBudget(categories.get(0).getCategoryId(), null, null);
+		categories = controller.getAllCategoriesForBudget(String.valueOf(categories.get(0).getCategoryId()), null, null);
 		int oneCategorySize = categories.size();
 		assertTrue(oneCategorySize < fullSize);
 	}

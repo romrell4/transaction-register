@@ -1,6 +1,7 @@
 package tests;
 
 import Controller.TransactionController;
+import Model.Errors.BadRequestException;
 import Model.PaymentType;
 import Model.Transaction;
 import org.apache.logging.log4j.LogManager;
@@ -24,22 +25,37 @@ public class TransactionControllerTest {
 
 	@Test
 	public void test1() {
-		List<Transaction> txs = controller.getAllTransactions(null);
+		List<Transaction> txs = controller.getAllTransactions(null, null, null);
 		assertTrue(txs.size() > 0);
 
-		txs = controller.getAllTransactions(PaymentType.CREDIT);
+		txs = controller.getAllTransactions("credit", null, null);
 		assertTrue(txs.size() > 0);
 
-		txs = controller.getAllTransactions(PaymentType.DEBIT);
+		txs = controller.getAllTransactions("DEBIT", null, null);
 		assertTrue(txs.size() > 0);
 
-		txs = controller.getAllTransactions(PaymentType.SAVINGS);
+		txs = controller.getAllTransactions("SaViNgS", null, null);
 		assertTrue(txs.size() > 0);
 
-		txs = controller.getAllTransactions(PaymentType.PERMANENT_SAVINGS);
+		txs = controller.getAllTransactions("PERMANENT_SAVINGS", null, null);
 		assertTrue(txs.size() > 0);
 
-		Transaction tx = controller.getTransactionById(txs.get(0).getTransactionId());
+		try {
+			txs = controller.getAllTransactions("permanent savings", null, null);
+			assertTrue(false);
+		} catch (BadRequestException e) {
+			assertTrue(true);
+		}
+
+		Transaction tx = controller.getTransactionById(String.valueOf(txs.get(0).getTransactionId()));
 		assertTrue(tx.getTransactionId() == txs.get(0).getTransactionId());
+
+		try {
+			controller.getTransactionById("hello");
+			assertTrue(false);
+		} catch (BadRequestException e) {
+			assertTrue(true);
+		}
+
 	}
 }
