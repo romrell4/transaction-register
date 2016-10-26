@@ -4,6 +4,7 @@ import Controller.TransactionController;
 import Model.Errors.BadRequestException;
 import Model.PaymentType;
 import Model.Transaction;
+import Model.TransactionHelper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Test;
@@ -25,7 +26,7 @@ public class TransactionControllerTest {
 
 	@Test
 	public void test1() {
-		List<Transaction> txs = controller.getAllTransactions(null, null, null);
+		List<TransactionHelper> txs = controller.getAllTransactions(null, null, null);
 		assertTrue(txs.size() > 0);
 
 		txs = controller.getAllTransactions("credit", null, null);
@@ -47,7 +48,7 @@ public class TransactionControllerTest {
 			assertTrue(true);
 		}
 
-		Transaction tx = controller.getTransactionById(String.valueOf(txs.get(0).getTransactionId()));
+		TransactionHelper tx = controller.getTransactionById(String.valueOf(txs.get(0).getTransactionId()));
 		assertTrue(tx.getTransactionId() == txs.get(0).getTransactionId());
 
 		try {

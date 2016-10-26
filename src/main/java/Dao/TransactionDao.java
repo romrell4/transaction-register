@@ -4,6 +4,7 @@ import Model.Errors.InternalServerException;
 import Model.Errors.NotFoundException;
 import Model.PaymentType;
 import Model.Transaction;
+import Model.TransactionHelper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -15,24 +16,24 @@ import java.util.*;
  */
 public class TransactionDao extends BaseDao {
 	private static final Logger LOG = LogManager.getLogger(TransactionDao.class);
+	private static final String SELECT_CLAUSE = "select tx.*, c.NAME from TRANSACTIONS tx join CATEGORIES c on tx.CATEGORY_ID = c.CATEGORY_ID ";
 
-	public List<Transaction> getAll(PaymentType paymentType, Integer month, Integer year) {
+	public List<TransactionHelper> getAll(PaymentType paymentType, Integer month, Integer year) {
 		try (Connection connection = getConnection()) {
-			String sql = "select * from TRANSACTIONS ";
+			String sql = SELECT_CLAUSE;
 			List<String> whereStatements = new ArrayList<>();
 			if (paymentType != null) {
-				whereStatements.add("PAYMENT_TYPE = '" + paymentType + "' ");
+				whereStatements.add("tx.PAYMENT_TYPE = '" + paymentType + "' ");
 			}
 			if (month != null && year != null) {
-				whereStatements.add("TO_CHAR(PURCHASE_DATE, 'YYYY-MM') = '" + year + "-" + month + "' ");
+				whereStatements.add("TO_CHAR(tx.PURCHASE_DATE, 'YYYY-MM') = '" + year + "-" + month + "' ");
 			}
 			sql += createWhereClause(whereStatements);
-			LOG.debug(sql);
 			ResultSet resultSet = connection.prepareStatement(sql).executeQuery();
 
-			List<Transaction> transactions = new ArrayList<>();
+			List<TransactionHelper> transactions = new ArrayList<>();
 			while (resultSet.next()) {
-				transactions.add(new Transaction(resultSet));
+				transactions.add(new TransactionHelper(resultSet));
 			}
 			return transactions;
 		} catch (Exception e) {
@@ -41,13 +42,13 @@ public class TransactionDao extends BaseDao {
 		}
 	}
 
-	public Transaction getById(int transactionId) {
+	public TransactionHelper getById(int transactionId) {
 		try (Connection connection = getConnection()) {
-			PreparedStatement preparedStatement = connection.prepareStatement("select * from TRANSACTIONS where TRANSACTION_ID = ?");
+			PreparedStatement preparedStatement = connection.prepareStatement(SELECT_CLAUSE + "where tx.TRANSACTION_ID = ?");
 			preparedStatement.setInt(1, transactionId);
 			ResultSet resultSet = preparedStatement.executeQuery();
 			if (resultSet.next()) {
-				return new Transaction(resultSet);
+				return new TransactionHelper(resultSet);
 			} else {
 				throw new NotFoundException("Couldn't find transaction with ID: " + transactionId);
 			}
@@ -57,15 +58,15 @@ public class TransactionDao extends BaseDao {
 		}
 	}
 
-	public List<Transaction> getAllByPaymentType(PaymentType paymentType) {
+	public List<TransactionHelper> getAllByPaymentType(PaymentType paymentType) {
 		try (Connection connection = getConnection()) {
-			PreparedStatement preparedStatement = connection.prepareStatement("select * from TRANSACTIONS where PAYMENT_TYPE = ?");
+			PreparedStatement preparedStatement = connection.prepareStatement(SELECT_CLAUSE + "where tx.PAYMENT_TYPE = ?");
 			preparedStatement.setString(1, paymentType.toString());
 			ResultSet resultSet = preparedStatement.executeQuery();
 
-			List<Transaction> transactions = new ArrayList<>();
+			List<TransactionHelper> transactions = new ArrayList<>();
 			while (resultSet.next()) {
-				transactions.add(new Transaction(resultSet));
+				transactions.add(new TransactionHelper(resultSet));
 			}
 			return transactions;
 		} catch (Exception e) {
@@ -85,7 +86,7 @@ public class TransactionDao extends BaseDao {
 		}
 	}
 
-	public Transaction save(Transaction transaction) {
+	public TransactionHelper save(TransactionHelper transaction) {
 		try (Connection connection = getConnection()) {
 			PreparedStatement preparedStatement = connection.prepareStatement("insert into TRANSACTIONS (PAYMENT_TYPE, PURCHASE_DATE, BUSINESS, AMOUNT, CATEGORY, DESCRIPTION, UPDATED_BY, DATE_TIME_UPDATED) values (?, ?, ?, ?, ?, ?, ?, now()) returning *");
 			preparedStatement.setString(1, transaction.getPaymentType().toString());
@@ -98,22 +99,19 @@ public class TransactionDao extends BaseDao {
 
 			ResultSet resultSet = preparedStatement.executeQuery();
 			if (resultSet.next()) {
-				return new Transaction(resultSet);
-			} else {
-				throw new InternalServerException("Creation failed");
+				Transaction newTx = new Transaction(resultSet);
+				return getById(newTx.getTransactionId());
 			}
+			throw new InternalServerException("Creation failed");
 		} catch (Exception e) {
 			LOG.error(e);
 			throw new InternalServerException("SQL Error", e);
 		}
 	}
 
-	public Transaction update(int transactionId, Transaction transaction) {
-		LOG.info(1);
+	public TransactionHelper update(int transactionId, TransactionHelper transaction) {
 		try (Connection connection = getConnection()) {
-			LOG.info(2);
 			PreparedStatement preparedStatement = connection.prepareStatement("update TRANSACTIONS set PAYMENT_TYPE = ?, PURCHASE_DATE = ?, BUSINESS = ?, AMOUNT = ?, CATEGORY = ?, DESCRIPTION = ?, UPDATED_BY = ?, DATE_TIME_UPDATED = now() where TRANSACTION_ID = ? returning *");
-			LOG.info(3);
 			preparedStatement.setString(1, transaction.getPaymentType().toString());
 			preparedStatement.setDate(2, new java.sql.Date(transaction.getPurchaseDate().getTime()));
 			preparedStatement.setString(3, transaction.getBusiness());
@@ -125,7 +123,8 @@ public class TransactionDao extends BaseDao {
 
 			ResultSet resultSet = preparedStatement.executeQuery();
 			if (resultSet.next()) {
-				return new Transaction(resultSet);
+				Transaction newTx = new Transaction(resultSet);
+				return getById(newTx.getTransactionId());
 			} else {
 				throw new NotFoundException("Couldn't find transaction with ID: " + transactionId);
 			}
