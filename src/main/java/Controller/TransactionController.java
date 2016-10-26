@@ -32,7 +32,7 @@ public class TransactionController extends BaseController {
 		return dao.getById(transactionId);
 	}
 
-	public TransactionHelper createTransaction(Transaction transaction) {
+	public TransactionHelper createTransaction(TransactionHelper transaction) {
 		LOG.info("/transactions POST");
 		return dao.save(transaction);
 	}
@@ -44,7 +44,7 @@ public class TransactionController extends BaseController {
 		return "Success";
 	}
 
-	public String updateTransaction(String transactionIdStr, Transaction transaction) {
+	public String updateTransaction(String transactionIdStr, TransactionHelper transaction) {
 		LOG.info("/transactions/:id PUT");
 		int transactionId = toInt(transactionIdStr);
 		dao.update(transactionId, transaction);

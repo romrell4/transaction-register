@@ -5,6 +5,7 @@ import Model.Errors.InternalServerException;
 import Model.Errors.NotFoundException;
 import Model.PaymentType;
 import Model.Transaction;
+import Model.TransactionHelper;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.apache.logging.log4j.LogManager;
@@ -54,8 +55,8 @@ public class Main {
 		});
 	}
 
-	private static Transaction getTxFromRequest(Request request) {
-		return gson.fromJson(request.body(), Transaction.class);
+	private static TransactionHelper getTxFromRequest(Request request) {
+		return gson.fromJson(request.body(), TransactionHelper.class);
 	}
 
 	private static int getHerokuAssignedPort() {
