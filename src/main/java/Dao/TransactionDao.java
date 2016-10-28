@@ -88,7 +88,7 @@ public class TransactionDao extends BaseDao {
 
 	public TransactionHelper save(TransactionHelper transaction) {
 		try (Connection connection = getConnection()) {
-			PreparedStatement preparedStatement = connection.prepareStatement("insert into TRANSACTIONS (PAYMENT_TYPE, PURCHASE_DATE, BUSINESS, AMOUNT, CATEGORY, DESCRIPTION, UPDATED_BY, DATE_TIME_UPDATED) values (?, ?, ?, ?, ?, ?, ?, now()) returning *");
+			PreparedStatement preparedStatement = connection.prepareStatement("insert into TRANSACTIONS (PAYMENT_TYPE, PURCHASE_DATE, BUSINESS, AMOUNT, CATEGORY_ID, DESCRIPTION, UPDATED_BY, DATE_TIME_UPDATED) values (?, ?, ?, ?, ?, ?, ?, now()) returning *");
 			preparedStatement.setString(1, transaction.getPaymentType().toString());
 			preparedStatement.setDate(2, new java.sql.Date(transaction.getPurchaseDate().getTime()));
 			preparedStatement.setString(3, transaction.getBusiness());
@@ -111,7 +111,7 @@ public class TransactionDao extends BaseDao {
 
 	public TransactionHelper update(int transactionId, TransactionHelper transaction) {
 		try (Connection connection = getConnection()) {
-			PreparedStatement preparedStatement = connection.prepareStatement("update TRANSACTIONS set PAYMENT_TYPE = ?, PURCHASE_DATE = ?, BUSINESS = ?, AMOUNT = ?, CATEGORY = ?, DESCRIPTION = ?, UPDATED_BY = ?, DATE_TIME_UPDATED = now() where TRANSACTION_ID = ? returning *");
+			PreparedStatement preparedStatement = connection.prepareStatement("update TRANSACTIONS set PAYMENT_TYPE = ?, PURCHASE_DATE = ?, BUSINESS = ?, AMOUNT = ?, CATEGORY_ID = ?, DESCRIPTION = ?, UPDATED_BY = ?, DATE_TIME_UPDATED = now() where TRANSACTION_ID = ? returning *");
 			preparedStatement.setString(1, transaction.getPaymentType().toString());
 			preparedStatement.setDate(2, new java.sql.Date(transaction.getPurchaseDate().getTime()));
 			preparedStatement.setString(3, transaction.getBusiness());
