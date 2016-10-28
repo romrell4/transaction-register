@@ -47,7 +47,6 @@ public class TransactionController extends BaseController {
 	public String updateTransaction(String transactionIdStr, TransactionHelper transaction) {
 		LOG.info("/transactions/:id PUT");
 		int transactionId = toInt(transactionIdStr);
-		dao.update(transactionId, transaction);
-		return "Success";
+		return dao.update(transactionId, transaction);
 	}
 }
