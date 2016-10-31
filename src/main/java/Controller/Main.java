@@ -32,6 +32,7 @@ public class Main {
 		delete("/transactions/:id", (req, res) -> transactionController.deleteTransaction(req.params(":id")), gson::toJson);
 
 		get("/categories", (req, res) -> categoryController.getAllCategoriesForBudget(req.queryParams("categoryId"), req.queryParams("month"), req.queryParams("year")), gson::toJson);
+		get("/categories/active", (req, res) -> categoryController.getAllActiveCategories(), gson::toJson);
 
 		exception(BadRequestException.class, (e, request, response) -> {
 			LOG.error(e);

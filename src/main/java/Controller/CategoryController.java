@@ -22,4 +22,8 @@ public class CategoryController extends BaseController {
 		Integer year = yearStr == null ? null : toInt(yearStr);
 		return categoryDao.getBudget(categoryId, month, year);
 	}
+
+	public List<CategoryHelper> getAllActiveCategories() {
+		return categoryDao.getAllActive();
+	}
 }

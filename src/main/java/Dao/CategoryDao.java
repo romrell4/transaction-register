@@ -23,21 +23,6 @@ public class CategoryDao extends BaseDao {
 	private static final String GROUP_CLAUSE = "group by c.CATEGORY_ID, c.NAME, c.AMOUNT_BUDGETED, TO_CHAR(tx.PURCHASE_DATE, 'YYYY-MM') ";
 	private static final String ORDER_CLAUSE = "order by c.CATEGORY_ID, TO_CHAR(tx.PURCHASE_DATE, 'YYYY-MM') desc";
 
-	public List<Category> getAll() {
-		try (Connection connection = getConnection()) {
-			ResultSet resultSet = connection.prepareStatement("select * from CATEGORIES").executeQuery();
-
-			List<Category> categories = new ArrayList<>();
-			while (resultSet.next()) {
-				categories.add(new Category(resultSet));
-			}
-			return categories;
-		} catch (Exception e) {
-			LOG.error(e);
-			throw new InternalServerException("SQL Error", e);
-		}
-	}
-
 	public List<CategoryHelper> getBudget(Integer categoryId, Integer month, Integer year) {
 		try (Connection connection = getConnection()) {
 			StringBuilder sql = new StringBuilder(SELECT_CLAUSE);
@@ -54,6 +39,21 @@ public class CategoryDao extends BaseDao {
 			sql.append(createWhereClause(whereStatements));
 			sql.append(GROUP_CLAUSE).append(ORDER_CLAUSE);
 			ResultSet resultSet = connection.prepareStatement(sql.toString()).executeQuery();
+
+			List<CategoryHelper> categories = new ArrayList<>();
+			while (resultSet.next()) {
+				categories.add(new CategoryHelper(resultSet));
+			}
+			return categories;
+		} catch (Exception e) {
+			LOG.error(e);
+			throw new InternalServerException("SQL Error", e);
+		}
+	}
+
+	public List<CategoryHelper> getAllActive() {
+		try (Connection connection = getConnection()) {
+			ResultSet resultSet = connection.prepareStatement("select null as MONTH, CATEGORY_ID, NAME, null as AMOUNT_BUDGETED, null as AMOUNT_SPENT, null as AMOUNT_LEFT from CATEGORIES where ACTIVE = TRUE").executeQuery();
 
 			List<CategoryHelper> categories = new ArrayList<>();
 			while (resultSet.next()) {
