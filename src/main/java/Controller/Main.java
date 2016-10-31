@@ -26,6 +26,7 @@ public class Main {
 		port(port);
 
 		get("/transactions", (req, res) -> transactionController.getAllTransactions(req.queryParams("type"), req.queryParams("month"), req.queryParams("year")), gson::toJson);
+		get("/transactions/sums", (req, res) -> transactionController.getPaymentTypeSums(), gson::toJson);
 		get("/transactions/:id", (req, res) -> transactionController.getTransactionById(req.params(":id")), gson::toJson);
 		post("/transactions", (req, res) -> transactionController.createTransaction(getTxFromRequest(req)), gson::toJson);
 		put("/transactions/:id", (req, res) -> transactionController.updateTransaction(req.params(":id"), getTxFromRequest(req)), gson::toJson);

@@ -3,6 +3,7 @@ package Controller;
 import Dao.TransactionDao;
 import Model.Errors.BadRequestException;
 import Model.PaymentType;
+import Model.PaymentTypeSum;
 import Model.Transaction;
 import Model.TransactionHelper;
 import org.apache.logging.log4j.LogManager;
@@ -30,6 +31,11 @@ public class TransactionController extends BaseController {
 		LOG.info("/transactions/:id GET");
 		int transactionId = toInt(transactionIdStr);
 		return dao.getById(transactionId);
+	}
+
+	public List<PaymentTypeSum> getPaymentTypeSums() {
+		LOG.info("/transactions/sums");
+		return dao.getSumsByPaymentType();
 	}
 
 	public TransactionHelper createTransaction(TransactionHelper transaction) {

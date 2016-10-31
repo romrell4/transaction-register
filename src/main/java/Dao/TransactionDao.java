@@ -3,6 +3,7 @@ package Dao;
 import Model.Errors.InternalServerException;
 import Model.Errors.NotFoundException;
 import Model.PaymentType;
+import Model.PaymentTypeSum;
 import Model.Transaction;
 import Model.TransactionHelper;
 import org.apache.logging.log4j.LogManager;
@@ -58,17 +59,16 @@ public class TransactionDao extends BaseDao {
 		}
 	}
 
-	public List<TransactionHelper> getAllByPaymentType(PaymentType paymentType) {
+	public List<PaymentTypeSum> getSumsByPaymentType() {
 		try (Connection connection = getConnection()) {
-			PreparedStatement preparedStatement = connection.prepareStatement(SELECT_CLAUSE + "where tx.PAYMENT_TYPE = ?");
-			preparedStatement.setString(1, paymentType.toString());
+			PreparedStatement preparedStatement = connection.prepareStatement("select PAYMENT_TYPE, SUM(AMOUNT) as TOTAL from TRANSACTIONS group by PAYMENT_TYPE");
 			ResultSet resultSet = preparedStatement.executeQuery();
 
-			List<TransactionHelper> transactions = new ArrayList<>();
+			List<PaymentTypeSum> sums = new ArrayList<>();
 			while (resultSet.next()) {
-				transactions.add(new TransactionHelper(resultSet));
+				sums.add(new PaymentTypeSum(resultSet));
 			}
-			return transactions;
+			return sums;
 		} catch (Exception e) {
 			LOG.error(e);
 			throw new InternalServerException("SQL Error", e);
