@@ -37,6 +37,14 @@ public class CategoryControllerTest {
 		int oneMonthSize = categories.size();
 		assertTrue(oneMonthSize < fullSize);
 
+		//Test that the rollover works
+		categories = controller.getAllCategoriesForBudget(null, "11", "2015");
+		categories = controller.getAllCategoriesForBudget(null, "12", "2015");
+
+		//Test that a future date still returns categories
+		categories = controller.getAllCategoriesForBudget(null, "1", "2030");
+		assertTrue(categories.size() == oneMonthSize);
+
 		categories = controller.getAllCategoriesForBudget(String.valueOf(categories.get(0).getCategoryId()), null, null);
 		int oneCategorySize = categories.size();
 		assertTrue(oneCategorySize < fullSize);
