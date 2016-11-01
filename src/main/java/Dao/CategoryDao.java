@@ -33,11 +33,12 @@ public class CategoryDao extends BaseDao {
 			}
 
 			if (month != null && year != null) {
-				whereStatements.add(String.format(DATE_WHERE_CLAUSE_FORMAT, month, year, (month + 1) % 12, month == 12 ? year + 1 : year));
+				whereStatements.add(String.format(DATE_WHERE_CLAUSE_FORMAT, month, year, (month % 12) + 1, year + (month / 12)));
 			}
 
 			sql.append(createWhereClause(whereStatements));
 			sql.append(GROUP_CLAUSE).append(ORDER_CLAUSE);
+
 			ResultSet resultSet = connection.prepareStatement(sql.toString()).executeQuery();
 
 			List<CategoryHelper> categories = new ArrayList<>();
