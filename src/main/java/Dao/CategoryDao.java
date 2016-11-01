@@ -19,6 +19,7 @@ public class CategoryDao extends BaseDao {
 	private static final String FROM_CLAUSE = "from CATEGORIES c left join TRANSACTIONS tx on c.CATEGORY_ID = tx.CATEGORY_ID ";
 	private static final String DATE_CLAUSE_FORMAT = "and DATE '%d/1/%d' <= tx.PURCHASE_DATE and tx.PURCHASE_DATE < DATE '%d/1/%d' ";
 	private static final String CATEGORY_ID_CLAUSE_FORMAT = "and c.CATEGORY_ID = %d ";
+	private static final String WHERE_ACTIVE_TRUE = "where ACTIVE = TRUE ";
 	private static final String GROUP_CLAUSE = "group by c.CATEGORY_ID, c.NAME, c.AMOUNT_BUDGETED, TO_CHAR(tx.PURCHASE_DATE, 'YYYY-MM') ";
 	private static final String ORDER_CLAUSE = "order by c.CATEGORY_ID, TO_CHAR(tx.PURCHASE_DATE, 'YYYY-MM') desc";
 
@@ -33,6 +34,8 @@ public class CategoryDao extends BaseDao {
 			if (month != null && year != null) {
 				sql.append(String.format(DATE_CLAUSE_FORMAT, month, year, (month % 12) + 1, year + (month / 12)));
 			}
+
+			sql.append(WHERE_ACTIVE_TRUE);
 
 			sql.append(GROUP_CLAUSE).append(ORDER_CLAUSE);
 
