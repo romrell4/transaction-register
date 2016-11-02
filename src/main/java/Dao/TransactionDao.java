@@ -61,7 +61,7 @@ public class TransactionDao extends BaseDao {
 
 	public List<PaymentTypeSum> getSumsByPaymentType() {
 		try (Connection connection = getConnection()) {
-			PreparedStatement preparedStatement = connection.prepareStatement("select PAYMENT_TYPE, SUM(AMOUNT) from TRANSACTIONS group by PAYMENT_TYPE");
+			PreparedStatement preparedStatement = connection.prepareStatement("select PAYMENT_TYPE, SUM(AMOUNT) as TOTAL from TRANSACTIONS group by PAYMENT_TYPE");
 			ResultSet resultSet = preparedStatement.executeQuery();
 
 			List<PaymentTypeSum> sums = new ArrayList<>();
