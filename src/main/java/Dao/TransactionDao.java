@@ -21,7 +21,7 @@ public class TransactionDao extends BaseDao {
 
 	public List<TransactionHelper> getAll(PaymentType paymentType, Integer month, Integer year) {
 		try (Connection connection = getConnection()) {
-			String sql = SELECT_CLAUSE;
+			StringBuilder sql = new StringBuilder(SELECT_CLAUSE);
 			List<String> whereStatements = new ArrayList<>();
 			if (paymentType != null) {
 				whereStatements.add("tx.PAYMENT_TYPE = '" + paymentType + "' ");
@@ -29,8 +29,10 @@ public class TransactionDao extends BaseDao {
 			if (month != null && year != null) {
 				whereStatements.add("TO_CHAR(tx.PURCHASE_DATE, 'YYYY-MM') = '" + year + "-" + month + "' ");
 			}
-			sql += createWhereClause(whereStatements);
-			ResultSet resultSet = connection.prepareStatement(sql).executeQuery();
+			sql.append(createWhereClause(whereStatements));
+			sql.append("order by tx.PURCHASE_DATE desc, tx.TRANSACTION_ID desc");
+
+			ResultSet resultSet = connection.prepareStatement(sql.toString()).executeQuery();
 
 			List<TransactionHelper> transactions = new ArrayList<>();
 			while (resultSet.next()) {
