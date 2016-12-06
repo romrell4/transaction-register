@@ -6,7 +6,7 @@ import Model.CategoryHelper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by eric on 10/18/16.
@@ -25,5 +25,18 @@ public class CategoryController extends BaseController {
 
 	public List<CategoryHelper> getAllActiveCategories() {
 		return categoryDao.getAllActive();
+	}
+
+	public List<List<CategoryHelper>> getAllCategoriesByMonth() {
+		Calendar cal = new GregorianCalendar();
+		Calendar end = new GregorianCalendar(2014, 9, 1);
+		cal.setTime(new Date());
+		List<List<CategoryHelper>> months = new ArrayList<>();
+		while (cal.after(end)) {
+			List<CategoryHelper> categories = getAllCategoriesForBudget(null, String.valueOf(cal.get(Calendar.MONTH) + 1), String.valueOf(cal.get(Calendar.YEAR)));
+			months.add(categories);
+			cal.add(Calendar.MONTH, -1);
+		}
+		return months;
 	}
 }
