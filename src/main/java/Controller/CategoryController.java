@@ -7,6 +7,7 @@ import Model.MonthHelper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -34,10 +35,8 @@ public class CategoryController extends BaseController {
 		cal.setTime(new Date());
 		List<MonthHelper> months = new ArrayList<>();
 		while (cal.after(end)) {
-			int month = cal.get(Calendar.MONTH) + 1;
-			int year = cal.get(Calendar.YEAR);
-			List<CategoryHelper> categories = getAllCategoriesForBudget(null, String.valueOf(month), String.valueOf(year));
-			months.add(new MonthHelper(year + "-" + month, categories));
+			List<CategoryHelper> categories = getAllCategoriesForBudget(null, String.valueOf(cal.get(Calendar.MONTH) + 1), String.valueOf(cal.get(Calendar.YEAR)));
+			months.add(new MonthHelper(new SimpleDateFormat("MMMM YYYY").format(cal.getTime()), categories));
 			cal.add(Calendar.MONTH, -1);
 		}
 		return months;
