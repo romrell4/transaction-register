@@ -3,6 +3,7 @@ package Controller;
 import Dao.CategoryDao;
 import Dao.TransactionDao;
 import Model.CategoryHelper;
+import Model.MonthHelper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -27,14 +28,16 @@ public class CategoryController extends BaseController {
 		return categoryDao.getAllActive();
 	}
 
-	public List<List<CategoryHelper>> getAllCategoriesByMonth() {
+	public List<MonthHelper> getAllCategoriesByMonth() {
 		Calendar cal = new GregorianCalendar();
 		Calendar end = new GregorianCalendar(2014, 9, 1);
 		cal.setTime(new Date());
-		List<List<CategoryHelper>> months = new ArrayList<>();
+		List<MonthHelper> months = new ArrayList<>();
 		while (cal.after(end)) {
-			List<CategoryHelper> categories = getAllCategoriesForBudget(null, String.valueOf(cal.get(Calendar.MONTH) + 1), String.valueOf(cal.get(Calendar.YEAR)));
-			months.add(categories);
+			int month = cal.get(Calendar.MONTH) + 1;
+			int year = cal.get(Calendar.YEAR);
+			List<CategoryHelper> categories = getAllCategoriesForBudget(null, String.valueOf(month), String.valueOf(year));
+			months.add(new MonthHelper(year + "-" + month, categories));
 			cal.add(Calendar.MONTH, -1);
 		}
 		return months;
