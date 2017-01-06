@@ -54,7 +54,7 @@ public class CategoryDao extends BaseDao {
 
 	public List<CategoryHelper> getAllActive() {
 		try (Connection connection = getConnection()) {
-			ResultSet resultSet = connection.prepareStatement("select null as MONTH, CATEGORY_ID, NAME, null as AMOUNT_BUDGETED, null as AMOUNT_SPENT, null as AMOUNT_LEFT from CATEGORIES where ACTIVE = TRUE").executeQuery();
+			ResultSet resultSet = connection.prepareStatement("select null as MONTH, CATEGORY_ID, NAME, AMOUNT_BUDGETED, null as AMOUNT_SPENT, null as AMOUNT_LEFT from CATEGORIES where ACTIVE = TRUE").executeQuery();
 
 			List<CategoryHelper> categories = new ArrayList<>();
 			while (resultSet.next()) {
