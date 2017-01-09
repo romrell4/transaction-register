@@ -1,0 +1,23 @@
+table {
+    background-color: white;
+}
+
+th {
+    vertical-align: top !important;
+    text-align: right;
+}
+
+th.center {
+    text-align: center;
+}
+
+td {
+    text-align: left;
+}
+
+span.subtitle {
+    font-weight: normal;
+    font-size: 12px;
+    padding: 0;
+    margin: 0;
+}

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="root">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Transaction Register</title>
+		<!-- Latest compiled and minified CSS -->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+
+		<!-- jQuery library -->
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+
+		<!-- Latest compiled JavaScript -->
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+		<script src="budget.js"></script>
+		<link rel="stylesheet" href="budget.css" />
+		<link rel="stylesheet" href="parent.css" />
+	</head>
+	<body class="container-fluid">
+		<h1>Transaction Register</h1>
+		<div id="navigation">
+			<a href="budget.html">Budget</a>
+			&nbsp;|&nbsp;
+			<a href="transactions.html">Transactions</a>
+		</div>
+		<div class="table-responsive">
+			<table class="table table-bordered" ng-controller="index as budget">
+				<thead>
+					<tr class="info">
+						<th>Monthly Budget</th>
+						<th class="center" ng-repeat="category in budget.categories">
+							{{category.name}}
+							<br />
+							<span class="subtitle">{{category.amountBudgeted}}</span>
+						</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="month in budget.months">
+						<th>{{month.month}}</th>
+						<td ng-repeat="category in month.categories" ng-class="{success: budget.isGreen(category), danger: budget.isRed(category)}">{{category.amountSpent}}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</body>
+</html>
