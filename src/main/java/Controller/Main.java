@@ -24,7 +24,7 @@ public class Main {
 		int port = getHerokuAssignedPort();
 		System.out.println("Listening on port " + port);
 		port(port);
-		staticFiles.location("../View");
+		staticFiles.location("/View");
 
 		//Web Service endpoints
 		get("/transactions", (req, res) -> transactionController.getAllTransactions(req.queryParams("type"), req.queryParams("month"), req.queryParams("year")), gson::toJson);
