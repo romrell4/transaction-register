@@ -27,7 +27,7 @@ public class TransactionDao extends BaseDao {
 				whereStatements.add("tx.PAYMENT_TYPE = '" + paymentType + "' ");
 			}
 			if (month != null && year != null) {
-				whereStatements.add("TO_CHAR(tx.PURCHASE_DATE, 'YYYY-MM') = '" + year + "-" + month + "' ");
+				whereStatements.add("TO_CHAR(tx.PURCHASE_DATE, 'YYYY-MM') = '" + year + "-" + String.format("%02d", month) + "' ");
 			}
 			sql.append(createWhereClause(whereStatements));
 			sql.append("order by tx.PURCHASE_DATE desc, tx.TRANSACTION_ID desc");
