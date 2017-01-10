@@ -7,6 +7,9 @@ angular.module("root", [])
 
 		$http.get("https://transaction-register.herokuapp.com/transactions")
 			.then(function(response) {
+				angular.forEach(response.data, function(value, key) {
+					value["purchaseDate"] = new Date(value["purchaseDate"]);
+				});
 				vm.transactions = response.data;
 			}, function(error) {
 				console.log("Error")
