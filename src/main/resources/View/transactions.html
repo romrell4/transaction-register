@@ -13,8 +13,8 @@
 		<!-- Latest compiled JavaScript -->
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
-		<script src="budget.js"></script>
-		<link rel="stylesheet" href="budget.css" />
+		<script src="transactions.js"></script>
+		<link rel="stylesheet" href="transactions.css" />
 		<link rel="stylesheet" href="parent.css" />
 	</head>
 	<body class="container-fluid">
@@ -23,6 +23,28 @@
 			<a href="budget.html">Budget</a>
 			&nbsp;|&nbsp;
 			<a href="transactions.html">Transactions</a>
+		</div>
+		<div class="table-responsive">
+			<table class="table table-hover table-bordered" ng-controller="app as budget">
+				<thead>
+					<tr class="info">
+						<th>Date</th>
+						<th>Business</th>
+						<th>Amount</th>
+						<th>Category</th>
+						<th>Description</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="tx in budget.transactions">
+						<td>{{tx.purchaseDate | date}}</td>
+						<td>{{tx.business}}</td>
+						<td>{{tx.amount}}</td>
+						<td>{{tx.categoryName}}</td>
+						<td>{{tx.description}}</td>
+					</tr>
+				</tbody>
+			</table>
 		</div>
 	</body>
 </html>
