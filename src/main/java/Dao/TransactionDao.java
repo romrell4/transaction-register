@@ -19,12 +19,15 @@ public class TransactionDao extends BaseDao {
 	private static final Logger LOG = LogManager.getLogger(TransactionDao.class);
 	private static final String SELECT_CLAUSE = "select tx.*, c.NAME from TRANSACTIONS tx join CATEGORIES c on tx.CATEGORY_ID = c.CATEGORY_ID ";
 
-	public List<TransactionHelper> getAll(PaymentType paymentType, Integer month, Integer year) {
+	public List<TransactionHelper> getAll(PaymentType paymentType, Integer categoryId, Integer month, Integer year) {
 		try (Connection connection = getConnection()) {
 			StringBuilder sql = new StringBuilder(SELECT_CLAUSE);
 			List<String> whereStatements = new ArrayList<>();
 			if (paymentType != null) {
 				whereStatements.add("tx.PAYMENT_TYPE = '" + paymentType + "' ");
+			}
+			if (categoryId != null) {
+				whereStatements.add("tx.CATEGORY_ID = " + categoryId + " ");
 			}
 			if (month != null && year != null) {
 				whereStatements.add("TO_CHAR(tx.PURCHASE_DATE, 'YYYY-MM') = '" + year + "-" + String.format("%02d", month) + "' ");

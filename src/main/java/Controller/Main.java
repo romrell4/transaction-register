@@ -3,8 +3,6 @@ package Controller;
 import Model.Errors.BadRequestException;
 import Model.Errors.InternalServerException;
 import Model.Errors.NotFoundException;
-import Model.PaymentType;
-import Model.Transaction;
 import Model.TransactionHelper;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -27,7 +25,7 @@ public class Main {
 		staticFiles.location("/View");
 
 		//Web Service endpoints
-		get("/transactions", (req, res) -> transactionController.getAllTransactions(req.queryParams("type"), req.queryParams("month"), req.queryParams("year")), gson::toJson);
+		get("/transactions", (req, res) -> transactionController.getAllTransactions(req.queryParams("type"), req.queryParams("categoryId"), req.queryParams("year"), req.queryParams("month")), gson::toJson);
 		get("/transactions/sums", (req, res) -> transactionController.getPaymentTypeSums(), gson::toJson);
 		get("/transactions/:id", (req, res) -> transactionController.getTransactionById(req.params(":id")), gson::toJson);
 		post("/transactions", (req, res) -> transactionController.createTransaction(getTxFromRequest(req)), gson::toJson);

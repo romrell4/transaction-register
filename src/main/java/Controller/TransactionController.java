@@ -1,10 +1,8 @@
 package Controller;
 
 import Dao.TransactionDao;
-import Model.Errors.BadRequestException;
 import Model.PaymentType;
 import Model.PaymentTypeSum;
-import Model.Transaction;
 import Model.TransactionHelper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -19,12 +17,13 @@ public class TransactionController extends BaseController {
 
 	private TransactionDao dao = new TransactionDao();
 
-	public List<TransactionHelper> getAllTransactions(String paymentTypeStr, String monthStr, String yearStr) {
+	public List<TransactionHelper> getAllTransactions(String paymentTypeStr, String categoryIdStr, String yearStr, String monthStr) {
 		LOG.info("/transactions GET");
 		PaymentType paymentType = paymentTypeStr == null ? null : toPaymentType(paymentTypeStr);
+		Integer categoryId = categoryIdStr == null ? null : toInt(categoryIdStr);
 		Integer month = monthStr == null ? null : toInt(monthStr);
 		Integer year = yearStr == null ? null : toInt(yearStr);
-		return dao.getAll(paymentType, month, year);
+		return dao.getAll(paymentType, categoryId, month, year);
 	}
 
 	public TransactionHelper getTransactionById(String transactionIdStr) {

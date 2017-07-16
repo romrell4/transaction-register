@@ -2,7 +2,6 @@ package tests;
 
 import Controller.TransactionController;
 import Model.Errors.BadRequestException;
-import Model.PaymentType;
 import Model.Transaction;
 import Model.TransactionHelper;
 import org.apache.logging.log4j.LogManager;
@@ -26,23 +25,23 @@ public class TransactionControllerTest {
 
 	@Test
 	public void test1() {
-		List<TransactionHelper> txs = controller.getAllTransactions(null, null, null);
+		List<TransactionHelper> txs = controller.getAllTransactions(null, null, null, null);
 		assertTrue(txs.size() > 0);
 
-		txs = controller.getAllTransactions("credit", null, null);
+		txs = controller.getAllTransactions("credit", null, null, null);
 		assertTrue(txs.size() > 0);
 
-		txs = controller.getAllTransactions("DEBIT", null, null);
+		txs = controller.getAllTransactions("DEBIT", null, null, null);
 		assertTrue(txs.size() > 0);
 
-		txs = controller.getAllTransactions("SaViNgS", null, null);
+		txs = controller.getAllTransactions("SaViNgS", null, null, null);
 		assertTrue(txs.size() > 0);
 
-		txs = controller.getAllTransactions("PERMANENT_SAVINGS", null, null);
+		txs = controller.getAllTransactions("PERMANENT_SAVINGS", null, null, null);
 		assertTrue(txs.size() > 0);
 
 		try {
-			txs = controller.getAllTransactions("permanent savings", null, null);
+			txs = controller.getAllTransactions("permanent savings", null, null, null);
 			assertTrue(false);
 		} catch (BadRequestException e) {
 			assertTrue(true);
@@ -57,6 +56,14 @@ public class TransactionControllerTest {
 		} catch (BadRequestException e) {
 			assertTrue(true);
 		}
+	}
 
+	@Test
+	public void test2() {
+		List<TransactionHelper> txs = controller.getAllTransactions(null, "1", "2017", "07");
+		for (TransactionHelper tx : txs) {
+			LOG.debug(tx.getBusiness() + " - " + tx.getAmount());
+		}
+		assertTrue(txs.size() > 0);
 	}
 }
