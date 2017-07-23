@@ -17,7 +17,7 @@ import java.util.*;
  */
 public class TransactionDao extends BaseDao {
 	private static final Logger LOG = LogManager.getLogger(TransactionDao.class);
-	private static final String SELECT_CLAUSE = "select tx.*, c.NAME from TRANSACTIONS tx join CATEGORIES c on tx.CATEGORY_ID = c.CATEGORY_ID ";
+	private static final String SELECT_CLAUSE = "select tx.*, c.NAME from TRANSACTIONS tx left join CATEGORIES c on tx.CATEGORY_ID = c.CATEGORY_ID ";
 
 	public List<TransactionHelper> getAll(PaymentType paymentType, Integer categoryId, Integer month, Integer year) {
 		try (Connection connection = getConnection()) {
