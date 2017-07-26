@@ -1,12 +1,14 @@
 package Dao;
 
 import Model.CategoryHelper;
+import Model.CategoryPrediction;
 import Model.Errors.InternalServerException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +24,40 @@ public class CategoryDao extends BaseDao {
 	private static final String WHERE_ACTIVE_TRUE = "where c.ACTIVE = TRUE ";
 	private static final String GROUP_CLAUSE = "group by c.CATEGORY_ID, c.NAME, c.AMOUNT_BUDGETED, TO_CHAR(tx.PURCHASE_DATE, 'YYYY-MM') ";
 	private static final String ORDER_CLAUSE = "order by c.CATEGORY_ID, TO_CHAR(tx.PURCHASE_DATE, 'YYYY-MM') desc";
+	private static final String CATEGORY_PREDICTION_SQL = "select a.BUSINESS, a.CATEGORY_ID, PERCENT\n" +
+														  "from (\n" +
+														  "\tselect a.BUSINESS, a.CATEGORY_ID, ROUND((1.0 * a.COUNT) / b.COUNT, 2) as PERCENT\n" +
+														  "\tfrom (\n" +
+														  "\t\tselect t.BUSINESS, t.CATEGORY_ID, count(*) as COUNT\n" +
+														  "\t\tfrom TRANSACTIONS t\n" +
+														  "\t\tgroup by t.BUSINESS, t.CATEGORY_ID\n" +
+														  "\t) a\n" +
+														  "\tjoin (\n" +
+														  "\t\tselect t.BUSINESS, count(*) as COUNT\n" +
+														  "\t\tfrom TRANSACTIONS t\n" +
+														  "\t\tgroup by t.BUSINESS\n" +
+														  "\t) b\n" +
+														  "\t\ton a.BUSINESS = b.BUSINESS) a\n" +
+														  "join (\n" +
+														  "\tselect y.BUSINESS, y.CATEGORY_ID\n" +
+														  "\tfrom (\n" +
+														  "\t\tselect BUSINESS, max(COUNT) as COUNT\n" +
+														  "\t\tfrom (\n" +
+														  "\t\t\tselect t.BUSINESS, t.CATEGORY_ID, count(*) as COUNT\n" +
+														  "\t\t\tfrom TRANSACTIONS t\n" +
+														  "\t\t\tgroup by t.BUSINESS, t.CATEGORY_ID) a\n" +
+														  "\t\tgroup by a.BUSINESS) z\n" +
+														  "\tjoin (\n" +
+														  "\t\tselect t.BUSINESS, t.CATEGORY_ID, count(*) as COUNT\n" +
+														  "\t\tfrom TRANSACTIONS t\n" +
+														  "\t\tgroup by t.BUSINESS, t.CATEGORY_ID) y\n" +
+														  "\t\t\n" +
+														  "\t\ton z.BUSINESS = y.BUSINESS\n" +
+														  "\t\tand z.COUNT = y.COUNT\n" +
+														  ") b\n" +
+														  "\ton a.BUSINESS = b.BUSINESS\n" +
+														  "\tand a.CATEGORY_ID = b.CATEGORY_ID\n" +
+														  "order by a.BUSINESS";
 
 	public List<CategoryHelper> getBudget(Integer categoryId, Integer month, Integer year) {
 		try (Connection connection = getConnection()) {
@@ -61,6 +97,21 @@ public class CategoryDao extends BaseDao {
 				categories.add(new CategoryHelper(resultSet));
 			}
 			return categories;
+		} catch (Exception e) {
+			LOG.error(e);
+			throw new InternalServerException("SQL Error", e);
+		}
+	}
+
+	public List<CategoryPrediction> getCategoryPredictions() {
+		try (Connection connection = getConnection()) {
+			ResultSet resultSet = connection.prepareStatement(CATEGORY_PREDICTION_SQL).executeQuery();
+
+			List<CategoryPrediction> predictions = new ArrayList<>();
+			while (resultSet.next()) {
+				predictions.add(new CategoryPrediction(resultSet));
+			}
+			return predictions;
 		} catch (Exception e) {
 			LOG.error(e);
 			throw new InternalServerException("SQL Error", e);

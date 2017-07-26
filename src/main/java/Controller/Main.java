@@ -35,6 +35,7 @@ public class Main {
 		get("/categories", (req, res) -> categoryController.getAllCategoriesForBudget(req.queryParams("categoryId"), req.queryParams("month"), req.queryParams("year")), gson::toJson);
 		get("/categories/active", (req, res) -> categoryController.getAllActiveCategories(), gson::toJson);
 		get("/categories/months", (req, res) -> categoryController.getAllCategoriesByMonth(), gson::toJson);
+		get("/categories/predictions", (req, res) -> categoryController.getCategoryPredictions(), gson::toJson);
 
 		exception(BadRequestException.class, (e, request, response) -> {
 			LOG.error(e);

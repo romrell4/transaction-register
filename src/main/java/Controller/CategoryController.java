@@ -3,6 +3,7 @@ package Controller;
 import Dao.CategoryDao;
 import Dao.TransactionDao;
 import Model.CategoryHelper;
+import Model.CategoryPrediction;
 import Model.MonthHelper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -40,5 +41,9 @@ public class CategoryController extends BaseController {
 			cal.add(Calendar.MONTH, -1);
 		}
 		return months;
+	}
+
+	public List<CategoryPrediction> getCategoryPredictions() {
+		return categoryDao.getCategoryPredictions();
 	}
 }
